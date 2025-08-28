@@ -36,7 +36,16 @@ struct ImagePicker: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             if let image = info[.originalImage] as? UIImage {
-                parent.onImagePicked(image)
+                if let filename = ImageProcessor.saveMergedImage(image: image) {
+                    print("Successfully saved merged file: \(filename)")
+                    
+                    if let mergedImage = ImageProcessor.loadImage(filename: filename) {
+                        parent.onImagePicked(mergedImage)
+                    }
+                } else {
+                    print("Failed to save merged image")
+                    parent.onImagePicked(image)
+                }
             }
             parent.presentationMode.wrappedValue.dismiss()
         }

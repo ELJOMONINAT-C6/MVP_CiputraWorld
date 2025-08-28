@@ -14,34 +14,34 @@ struct HistoryView: View {
     @State private var timestamp: Date?
     
     var body: some View {
-        VStack {
-            ZStack {
-                VStack {
-                    if let path = savedImagePath,
-                       let uiImage = UIImage(contentsOfFile: path) {
-                        ZStack(alignment: .bottomTrailing) {
+        NavigationStack {
+            VStack {
+                ZStack {
+                    VStack {
+                        if let path = savedImagePath,
+                           let uiImage = UIImage(contentsOfFile: path) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFit()
                                 .ignoresSafeArea()
-                            if let ts = timestamp {
-                                Text("\(ts.formatted(date: .abbreviated, time: .standard))")
-                                    .padding()
-                            }
                         }
                     }
-                }
-                VStack {
-                    Button("Open Camera") {
-                        showCamera = true
+                    VStack {
+                        Button("Open Camera") {
+                            showCamera = true
+                        }
+                        .padding()
+                        NavigationLink("View Saved Images") {
+                            SavedImagesView()
+                        }
+                        .buttonStyle(.borderedProminent)
                     }
-                    .padding()
                 }
             }
-        }
-        .sheet(isPresented: $showCamera) {
-            ImagePicker(sourceType: .camera) { image in
-                saveImage(image)
+            .sheet(isPresented: $showCamera) {
+                ImagePicker(sourceType: .camera) { image in
+                    saveImage(image)
+                }
             }
         }
     }
