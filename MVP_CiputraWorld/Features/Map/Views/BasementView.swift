@@ -5,14 +5,6 @@
 //  Created by Niken Larasati on 28/08/25.
 //
 
-
-//
-//  BasementView.swift
-//  explore-map
-//
-//  Created by Niken Larasati on 27/08/25.
-//
-
 import SwiftUI
 
 struct BasementView: View {

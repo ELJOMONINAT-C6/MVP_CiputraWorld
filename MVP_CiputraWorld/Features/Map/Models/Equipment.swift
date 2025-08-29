@@ -13,5 +13,6 @@ struct Equipment: Codable {
     let lokasiPemasangan: String
     let tanggalInstalasi: String
     let masaGaransi: String
+    var imagePath: String?
     var spesifikasi: [String: String] // key-value bebas
 }

@@ -12,7 +12,7 @@ struct EquipmentPointView: View {
     let equipment: Equipment
     let geometrySize: CGSize
     let isSelected: Bool
-    let onTap: () -> Void
+//    let onTap: () -> Void
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel
     
     private var pointColor: Color {
@@ -58,21 +58,21 @@ struct EquipmentPointView: View {
                 x: equipment.xPosition,
                 y: equipment.yPosition
             )
-            .onTapGesture {
-                onTap()
-            }
-            .overlay(
-                // Equipment ID label
-                Text(equipment.assetID)
-                    .font(.caption2)
-                    .fontWeight(isSelected ? .bold : .regular)
-                    .foregroundColor(.black)
-                    .background(Color.white.opacity(0.9))
-                    .cornerRadius(4)
-                    .position(
-                        x: equipment.xPosition,
-                        y: equipment.yPosition - 25
-                    )
-            )
+//            .onTapGesture {
+//                onTap()
+//            }
+//            .overlay(
+//                // Equipment ID label
+//                Text(equipment.assetID)
+//                    .font(.caption2)
+//                    .fontWeight(isSelected ? .bold : .regular)
+//                    .foregroundColor(.black)
+//                    .background(Color.white.opacity(0.9))
+//                    .cornerRadius(4)
+//                    .position(
+//                        x: equipment.xPosition,
+//                        y: equipment.yPosition - 25
+//                    )
+//            )
     }
 }
