@@ -1,21 +1,48 @@
 //
 //  ContentView.swift
-//  MVP_CiputraWorld
+//  explore-map
 //
-//  Created by Nathan Gunawan on 20/08/25.
+//  Created by Niken Larasati on 22/08/25.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    
+    //for styling tab bar
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(named: "darkblue")
+        appearance.stackedLayoutAppearance.selected.iconColor = .white
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            NavigationStack {
+                LandingPageView()
+            }
+            .tabItem {
+                Label("Denah", systemImage: "map")
+            }
+
+            NavigationStack {
+               MapView()
+            }
+            .tabItem {
+                Label("Tambah", systemImage: "plus")
+            }
+
+            NavigationStack {
+                MapView()
+            }
+            .tabItem {
+                Label("Riwayat", systemImage: "note")
+            }
         }
-        .padding()
     }
 }
 
