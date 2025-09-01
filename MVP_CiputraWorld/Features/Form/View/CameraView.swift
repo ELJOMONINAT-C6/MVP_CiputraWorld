@@ -8,12 +8,18 @@
 import SwiftUI
 import UIKit
 
+// View for Camera
 struct CameraView: View {
+    
+    //Defining Variables
     let machine: String
     let date: Date
     let details: String
     let notes: String?
+    let status: String
+    let technician: String
 
+    // handler for if user press cancel, or proceed, so it can dismiss the current appearing page
     @Environment(\.dismiss) private var dismiss
 
     @State private var showCamera: Bool = false
@@ -38,12 +44,12 @@ struct CameraView: View {
                     Color.clear
                 }
             }
-        }
+        } // auto open camera when load, set showcamera to true
         .onAppear {
             DispatchQueue.main.async {
                 showCamera = true
             }
-        }
+        } //controls if the user cancel (go back to the previous page) or decide to proceed to ConfirmationView
         .sheet(isPresented: $showCamera) {
             ImagePicker(
                 sourceType: .camera,
@@ -55,7 +61,7 @@ struct CameraView: View {
                     dismiss() // langsung keluar jika cancel kamera
                 }
             )
-        }
+        } // open confirmationview
         .fullScreenCover(isPresented: $showConfirmation) {
             if let imageForConfirm = capturedImage {
                 ConfirmationView(
@@ -63,6 +69,8 @@ struct CameraView: View {
                     date: date,
                     details: details,
                     notes: notes,
+                    status: status,
+                    technician: technician,
                     image: imageForConfirm,
                     onSave: {
                         savedSuccessfully = true
@@ -72,15 +80,15 @@ struct CameraView: View {
         }
         .onChange(of: showConfirmation) { newValue in
             if !newValue {
+                // If saved → close CameraView entirely
                 if savedSuccessfully {
-                    // Jika berhasil save → kembali ke InputView
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-                        if !showCamera { // pastikan kamera sudah tertutup
+                        if !showCamera {
                             dismiss()
                         }
                     }
+                    // If not saved >> reset image & reopen camera (Retake)
                 } else {
-                    // Jika tidak save → buka kamera lagi (foto ulang)
                     capturedImage = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
                         if !savedSuccessfully {

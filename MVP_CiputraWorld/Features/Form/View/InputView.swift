@@ -8,21 +8,31 @@
 import SwiftUI
 import SwiftData
 
+// View for Input Form
 struct InputView: View {
     @Environment(\.modelContext) private var context
     
+    // Defining Variables
     @State private var selectedMachine: String = ""
     @State private var maintenanceDate: Date = Date()
     @State private var maintenanceDetails: String = ""
     @State private var additionalNotes: String = ""
     
+    // New fields
+    @State private var maintenanceStatus: String = ""
+    @State private var technicianName: String = ""
+    
     @State private var showValidationErrors = false
     @State private var navigateToCamera = false
     
     let machines = ["Machine A", "Machine B", "Machine C", "Machine D"]
+    let statuses = ["Rusak", "Maintenance Selesai"]
+    
+    
     
     var body: some View {
         NavigationView {
+            // Form for Input Data
             Form {
                 // Machine Picker
                 Section(header: Text("Machine")) {
@@ -31,6 +41,7 @@ struct InputView: View {
                             Text(machine).tag(machine)
                         }
                     }
+                    
                     if showValidationErrors && selectedMachine.isEmpty {
                         validationMessage("Please select a machine")
                     }
@@ -48,6 +59,28 @@ struct InputView: View {
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
                     if showValidationErrors && maintenanceDetails.isEmpty {
                         validationMessage("Please enter details")
+                    }
+                }
+                
+                // Maintenance Status
+                Section(header: Text("Maintenance Status")) {
+                    Picker("Select Status", selection: $maintenanceStatus) {
+                        ForEach(statuses, id: \.self) { status in
+                            Text(status).tag(status)
+                        }
+                    }
+                    .pickerStyle(SegmentedPickerStyle())
+                    
+                    if showValidationErrors && maintenanceStatus.isEmpty {
+                        validationMessage("Please select maintenance status")
+                    }
+                }
+                
+                // Technician Name
+                Section(header: Text("Nama Teknisi")) {
+                    TextField("Enter technician name", text: $technicianName)
+                    if showValidationErrors && technicianName.isEmpty {
+                        validationMessage("Please enter technician name")
                     }
                 }
                 
@@ -70,7 +103,7 @@ struct InputView: View {
                     }
                 }
             }
-            .navigationTitle("Add Maintenance")
+            .navigationTitle("Input Form")
             // Navigate to CameraView
             .background(
                 NavigationLink(
@@ -78,7 +111,9 @@ struct InputView: View {
                         machine: selectedMachine,
                         date: maintenanceDate,
                         details: maintenanceDetails,
-                        notes: additionalNotes
+                        notes: additionalNotes,
+                        status: maintenanceStatus,
+                        technician: technicianName
                     ),
                     isActive: $navigateToCamera
                 ) {
@@ -89,7 +124,7 @@ struct InputView: View {
         }
     }
     
-    // MARK: - Validation Helper
+    // Validation Helper
     @ViewBuilder
     private func validationMessage(_ text: String) -> some View {
         HStack(spacing: 4) {
@@ -101,10 +136,12 @@ struct InputView: View {
         }
     }
     
-    // MARK: - Ambil Gambar Logic
+    // Logic for Proceeding to the Next Page
     private func handleAmbilGambar() {
         guard !selectedMachine.isEmpty,
-              !maintenanceDetails.isEmpty else {
+              !maintenanceDetails.isEmpty,
+              !maintenanceStatus.isEmpty,
+              !technicianName.isEmpty else {
             showValidationErrors = true
             return
         }
@@ -112,7 +149,7 @@ struct InputView: View {
     }
 }
 
-// MARK: - Preview
+// Preview
 struct InputView_Previews: PreviewProvider {
     static var previews: some View {
         InputView()

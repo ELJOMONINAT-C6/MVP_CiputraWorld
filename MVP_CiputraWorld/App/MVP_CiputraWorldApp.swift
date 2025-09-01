@@ -11,7 +11,7 @@ import SwiftUI
 struct MVP_CiputraWorldApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            InputView()
         }
     }
 }
