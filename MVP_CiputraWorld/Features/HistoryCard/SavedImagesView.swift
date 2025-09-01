@@ -38,7 +38,7 @@ struct SavedImagesView: View {
                         }
                         .padding(.vertical, 4)
                     } else {
-                        Text("⚠️ Failed to load \(filename)")
+                        Text("Failed to load \(filename)")
                             .foregroundColor(.red)
                     }
                 }
@@ -73,7 +73,7 @@ struct SavedImagesView: View {
             let files = try FileManager.default.contentsOfDirectory(atPath: documentsURL.path)
             savedFilenames = files.filter { $0.hasPrefix("merged_") }
         } catch {
-            print("❌ Error loading filenames: \(error)")
+            print("Error loading filenames: \(error)")
         }
     }
     

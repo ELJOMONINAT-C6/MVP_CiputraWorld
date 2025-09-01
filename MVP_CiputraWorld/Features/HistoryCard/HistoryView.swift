@@ -2,66 +2,116 @@
 //  HistoryView.swift
 //  MVP_CiputraWorld
 //
-//  Created by Kezia Elice on 28/08/25.
+//  Created by Kezia Elice on 29/08/25.
 //
 
 import Foundation
 import SwiftUI
 
+enum Category: String, CaseIterable, Identifiable {
+    case ac = "Air Conditioner"
+    case ahu = "AHU"
+
+    var id: String { self.rawValue }
+}
+
+enum Equipment: String, CaseIterable, Identifiable {
+    case AC0102, AHU0101
+    var id: Self { self }
+}
+
+
+extension Category {
+    var suggestedEquipment: Equipment {
+        switch self {
+        case .ac: return .AC0102
+        case .ahu: return .AHU0101
+        }
+    }
+}
+
 struct HistoryView: View {
-    @State private var showCamera = false
-    @State private var savedImagePath: String?
-    @State private var timestamp: Date?
+    @State private var selectedCategory: Category = .ac
+    @State private var suggestedEquipment: String = Category.ac.suggestedEquipment.rawValue
+    @State private var startDate = Date()
+    @State private var endDate = Date()
+    @State private var searchHistory = false
     
     var body: some View {
         NavigationStack {
             VStack {
-                ZStack {
-                    VStack {
-                        if let path = savedImagePath,
-                           let uiImage = UIImage(contentsOfFile: path) {
-                            Image(uiImage: uiImage)
-                                .resizable()
-                                .scaledToFit()
-                                .ignoresSafeArea()
+                Form {
+                    Section {
+                        Picker("Jenis Alat", selection: $selectedCategory) {
+                            ForEach(Category.allCases) { category in
+                                Text(category.rawValue)
+                                    .tag(category)
+                            }
                         }
+                        .onChange(of: selectedCategory) { newValue in
+                            suggestedEquipment = newValue.suggestedEquipment.rawValue
+                        }
+                        HStack {
+                            Text("Kode Alat")
+                            Spacer()
+                            TextField("Masukkan Kode Alat", text: $suggestedEquipment)
+                                .multilineTextAlignment(.trailing)
+                                .foregroundStyle(.secondary)
+                        }
+                    } header: {
+                        Text("JENIS PERALATAN")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
-                    VStack {
-                        Button("Open Camera") {
-                            showCamera = true
-                        }
-                        .padding()
-                        NavigationLink("View Saved Images") {
-                            SavedImagesView()
-                        }
-                        .buttonStyle(.borderedProminent)
+                    
+                    Section {
+                        DatePicker(
+                            "Dari tanggal",
+                            selection: $startDate,
+                            displayedComponents: [.date]
+                        )
+                        DatePicker(
+                            "Sampai tanggal",
+                            selection: $endDate,
+                            displayedComponents: [.date]
+                        )
+                    } header: {
+                        Text("PERIODE")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
+                    Button(action: {handleSubmit(); searchHistory = true}) {
+                        Text("Lihat Informasi")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .disabled(suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .buttonStyle(.borderedProminent)
+                    .tint(.interactiveClr)
+                    .foregroundColor(.textClr)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                }
+                .navigationDestination(isPresented: $searchHistory) {
+                    HistoryListView(
+                        category: selectedCategory,
+                        kodeAlat: suggestedEquipment,
+                        startDate: startDate,
+                        endDate: endDate
+                    )
                 }
             }
-            .sheet(isPresented: $showCamera) {
-                ImagePicker(sourceType: .camera) { image in
-                    saveImage(image)
-                }
-            }
+            .navigationTitle("Cari History Card")
         }
     }
     
-    private func saveImage(_ image: UIImage) {
-        if let data = image.jpegData(compressionQuality: 0.9) {
-            let filename = getDocumentsDirectory().appendingPathComponent("\(UUID().uuidString).jpg")
-            do {
-                try data.write(to: filename)
-                savedImagePath = filename.path
-                timestamp = Date()
-            } catch {
-                print("Error saving image: \(error)")
-            }
+    private func handleSubmit() {
+        guard !suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty else {
+            print("Equipment ID is empty")
+            return
         }
+        print("Submit data: \(selectedCategory.rawValue) \(suggestedEquipment) \(startDate) to \(endDate)")
     }
-    
-    private func getDocumentsDirectory() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
+
 }
 
 #Preview {

@@ -58,10 +58,10 @@ struct ImageProcessor {
         
         do {
             try data.write(to: fileURL)
-            print("✅ Saved image at \(fileURL)")
+            print("Saved image at \(fileURL)")
             return filename
         } catch {
-                print("❌ Failed to save image: \(error)")
+                print("Failed to save image: \(error)")
                 return nil
         }
     }
