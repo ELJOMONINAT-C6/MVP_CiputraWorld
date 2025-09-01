@@ -38,15 +38,19 @@ struct HistoryListView: View {
     
     var body: some View {
         List(histories) { history in
-            HStack {
-                Text(history.title)
-                    .font(.body)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text(history.date.formatted(date: .abbreviated, time: .omitted))
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+            NavigationLink {
+                HistoryDetailView(history: history)
+            } label: {
+                HStack {
+                    Text(history.title)
+                        .font(.body)
+                    Spacer()
+                    Text(history.date.formatted(date: .abbreviated, time: .omitted))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.vertical, 4)
             }
-            .padding(.vertical, 4)
         }
         .navigationTitle("History")
         .navigationBarTitleDisplayMode(.inline)
