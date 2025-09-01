@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct HistoryItem: Identifiable {
+struct HistoryItem2: Identifiable {
     let id = UUID()
     let title: String
     let date: Date
@@ -25,15 +25,15 @@ struct HistoryListView: View {
     let endDate: Date
 
 //    Dummy
-    let histories: [HistoryItem] = [
-        HistoryItem(title: "Mengisi Freon", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 17))!),
-        HistoryItem(title: "Mengganti Kapasitor", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 27))!),
-        HistoryItem(title: "Mengganti Kapasitor", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 29))!),
-        HistoryItem(title: "Service Outdoor", date: calendar.date(from: DateComponents(year: 2025, month: 9, day: 1))!),
-        HistoryItem(title: "Pengecekan Rutin", date: calendar.date(from: DateComponents(year: 2025, month: 9, day: 23))!),
-        HistoryItem(title: "Cuci AC", date: calendar.date(from: DateComponents(year: 2025, month: 10, day: 13))!),
-        HistoryItem(title: "Mengisi Freon", date: calendar.date(from: DateComponents(year: 2025, month: 10, day: 20))!),
-        HistoryItem(title: "Service Indoor", date: calendar.date(from: DateComponents(year: 2025, month: 11, day: 12))!)
+    let histories: [HistoryItem2] = [
+        HistoryItem2(title: "Mengisi Freon", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 17))!),
+        HistoryItem2(title: "Mengganti Kapasitor", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 27))!),
+        HistoryItem2(title: "Mengganti Kapasitor", date: calendar.date(from: DateComponents(year: 2025, month: 8, day: 29))!),
+        HistoryItem2(title: "Service Outdoor", date: calendar.date(from: DateComponents(year: 2025, month: 9, day: 1))!),
+        HistoryItem2(title: "Pengecekan Rutin", date: calendar.date(from: DateComponents(year: 2025, month: 9, day: 23))!),
+        HistoryItem2(title: "Cuci AC", date: calendar.date(from: DateComponents(year: 2025, month: 10, day: 13))!),
+        HistoryItem2(title: "Mengisi Freon", date: calendar.date(from: DateComponents(year: 2025, month: 10, day: 20))!),
+        HistoryItem2(title: "Service Indoor", date: calendar.date(from: DateComponents(year: 2025, month: 11, day: 12))!)
     ]
     
     var body: some View {

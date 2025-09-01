@@ -11,7 +11,7 @@ import SwiftUI
 struct HistoryDetailView: View {
     @Environment(\.dismiss) var dismiss
     
-    let history: HistoryItem
+    let history: HistoryItem2
     
     var body: some View {
         ScrollView {
@@ -79,7 +79,7 @@ struct HistoryDetailView: View {
 }
 
 #Preview {
-    HistoryDetailView(history: HistoryItem(
+    HistoryDetailView(history: HistoryItem2(
         title: "Mengganti Kapasitor",
         date: Calendar.current.date(from: DateComponents(year: 2025, month: 9, day: 1))!
     ))

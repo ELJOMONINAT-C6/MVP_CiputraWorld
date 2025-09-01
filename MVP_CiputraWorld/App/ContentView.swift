@@ -30,14 +30,14 @@ struct ContentView: View {
             }
 
             NavigationStack {
-               MapView()
+               InputView()
             }
             .tabItem {
                 Label("Tambah", systemImage: "plus")
             }
 
             NavigationStack {
-                MapView()
+                HistoryView()
             }
             .tabItem {
                 Label("Riwayat", systemImage: "note")

@@ -15,14 +15,14 @@ enum Category: String, CaseIterable, Identifiable {
     var id: String { self.rawValue }
 }
 
-enum Equipment: String, CaseIterable, Identifiable {
+enum Equipment2: String, CaseIterable, Identifiable {
     case AC0102, AHU0101
     var id: Self { self }
 }
 
 
 extension Category {
-    var suggestedEquipment: Equipment {
+    var suggestedEquipment: Equipment2 {
         switch self {
         case .ac: return .AC0102
         case .ahu: return .AHU0101
