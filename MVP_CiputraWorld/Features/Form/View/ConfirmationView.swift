@@ -9,13 +9,16 @@ import SwiftUI
 import SwiftData
 import UIKit
 
-/// ConfirmationView previews the captured image and saves the full record to SwiftData.
-/// - `onSave` is invoked **before** the view dismisses to inform CameraView that the save succeeded.
+// Confirmation View before Submitting to Database
 struct ConfirmationView: View {
+    
+    // Stating Variables
     let machine: String
     let date: Date
     let details: String
     let notes: String?
+    let status: String
+    let technician: String
     let image: UIImage
     let onSave: () -> Void
 
@@ -29,21 +32,36 @@ struct ConfirmationView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 16) {
-                // Photo preview
                 Image(uiImage: image)
                     .resizable()
                     .scaledToFit()
                     .cornerRadius(12)
                     .padding()
 
-                // timestamp + basic info
-                Text(date.formatted(date: .abbreviated, time: .standard))
-                    .font(.caption)
-                    .foregroundColor(.secondary)
+                VStack(spacing: 4) {
+                    Text(date.formatted(date: .abbreviated, time: .standard))
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                }
 
                 Spacer()
-
-                // Submit button
+                
+                // Foto Ulang Button (moved above Submit)
+                Button(action: { dismiss() }) {
+                    HStack {
+                        Image(systemName: "camera.fill")
+                        Text("Foto Ulang")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 24)
+                }
+                
+                // Submit Button to store data to database
                 Button(action: submitRecord) {
                     HStack {
                         if isSaving {
@@ -51,47 +69,29 @@ struct ConfirmationView: View {
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         }
                         Text(isSaving ? "Menyimpan..." : "Submit")
-                            .font(.headline)
+                            .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor)
+                    .background(Color(red: 15/255, green: 22/255, blue: 58/255)) // navy color
                     .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 24)
                 }
                 .disabled(isSaving)
-
-                // Foto Ulang (retake)
-                Button(action: {
-                    // Just dismiss this view — CameraView will reopen camera in onChange
-                    dismiss()
-                }) {
-                    Text("Foto Ulang")
-                        .font(.body)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray4))
-                        .foregroundColor(.primary)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                }
 
                 Spacer()
             }
             .navigationTitle("Konfirmasi Foto")
+            .navigationBarTitleDisplayMode(.inline) // 👈 centered + smaller
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Batal") {
-                        dismiss()
-                    }
+                    Button("Batal") { dismiss() }
                 }
             }
+            // Alert on pressing the button
             .alert("Berhasil", isPresented: $showSavedAlert) {
-                Button("OK", role: .cancel) {
-                    // After acknowledging, dismiss back to CameraView (CameraView will pop if onSave was called)
-                    dismiss()
-                }
+                Button("OK", role: .cancel) { dismiss() }
             } message: {
                 Text("Data berhasil disimpan.")
             }
@@ -100,41 +100,52 @@ struct ConfirmationView: View {
             } message: {
                 Text(saveError ?? "Unknown error")
             }
-        } // NavigationView
+        }
     }
 
+    // Submit Button Handler  (the logic to store to database)
     private func submitRecord() {
         isSaving = true
         saveError = nil
 
-        // Convert image to Data (jpeg)
         guard let imageData = image.jpegData(compressionQuality: 0.85) else {
             saveError = "Gagal memproses foto."
             isSaving = false
             return
         }
 
-        // Create SwiftData HistoryItem (your model). We store photoData directly.
         let record = HistoryItem(
             machine: machine,
             date: date,
             details: details,
             notes: notes,
-            photoData: imageData
+            photoData: imageData,
+            status: status,
+            technician: technician
         )
 
         context.insert(record)
         do {
             try context.save()
-            // Inform CameraView that save succeeded (so it can pop)
             onSave()
             isSaving = false
             showSavedAlert = true
-            // Note: we *don't* call dismiss() here immediately so the user sees the success alert.
-            // The alert's OK button will dismiss ConfirmationView; CameraView will then pop because onSave was called.
         } catch {
             isSaving = false
             saveError = "Gagal menyimpan: \(error.localizedDescription)"
         }
     }
+}
+
+#Preview {
+    ConfirmationView(
+        machine: "AC-Unit-01",
+        date: Date(),
+        details: "Perlu pengecekan filter udara.",
+        notes: "Filter agak kotor, perlu dibersihkan.",
+        status: "Pending",
+        technician: "Nathan Gunawan",
+        image: UIImage(systemName: "wrench.and.screwdriver")!, // sample SF Symbol as placeholder
+        onSave: {}
+    )
 }
