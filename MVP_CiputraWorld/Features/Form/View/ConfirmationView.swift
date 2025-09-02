@@ -46,6 +46,21 @@ struct ConfirmationView: View {
 
                 Spacer()
                 
+                // Foto Ulang Button (moved above Submit)
+                Button(action: { dismiss() }) {
+                    HStack {
+                        Image(systemName: "camera.fill")
+                        Text("Foto Ulang")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 24)
+                }
+                
                 // Submit Button to store data to database
                 Button(action: submitRecord) {
                     HStack {
@@ -64,30 +79,17 @@ struct ConfirmationView: View {
                     .padding(.horizontal, 24)
                 }
                 .disabled(isSaving)
-                
-                // Button if want to retake photo
-                Button(action: { dismiss() }) {
-                    HStack {
-                        Image(systemName: "camera.fill")
-                        Text("Foto Ulang")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal, 24)
-                }
 
                 Spacer()
             }
             .navigationTitle("Konfirmasi Foto")
+            .navigationBarTitleDisplayMode(.inline) // 👈 centered + smaller
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Batal") { dismiss() }
                 }
-            } //Alert on pressing the button
+            }
+            // Alert on pressing the button
             .alert("Berhasil", isPresented: $showSavedAlert) {
                 Button("OK", role: .cancel) { dismiss() }
             } message: {
