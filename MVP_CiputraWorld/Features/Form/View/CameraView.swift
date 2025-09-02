@@ -26,6 +26,9 @@ struct CameraView: View {
     @State private var capturedImage: UIImage? = nil
     @State private var showConfirmation: Bool = false
     @State private var savedSuccessfully: Bool = false
+    
+    // 👇 Add state for showing the alert
+    @State private var showInstructionAlert: Bool = false
 
     var body: some View {
         ZStack {
@@ -44,12 +47,24 @@ struct CameraView: View {
                     Color.clear
                 }
             }
-        } // auto open camera when load, set showcamera to true
+        }
+        // auto open camera when load, set showcamera to true
         .onAppear {
             DispatchQueue.main.async {
+                // First show instruction popup
+                showInstructionAlert = true
+            }
+        }
+        // 👇 The alert you showed in screenshot
+        .alert("Ambil Gambar", isPresented: $showInstructionAlert) {
+            Button("Oke") {
+                // When user taps OK → then open the camera
                 showCamera = true
             }
-        } //controls if the user cancel (go back to the previous page) or decide to proceed to ConfirmationView
+        } message: {
+            Text("Pastikan kamera jelas dan memiliki pencahayaan yang cukup")
+        }
+        // Camera sheet
         .sheet(isPresented: $showCamera) {
             ImagePicker(
                 sourceType: .camera,
@@ -61,7 +76,8 @@ struct CameraView: View {
                     dismiss() // langsung keluar jika cancel kamera
                 }
             )
-        } // open confirmationview
+        }
+        // Confirmation view
         .fullScreenCover(isPresented: $showConfirmation) {
             if let imageForConfirm = capturedImage {
                 ConfirmationView(
@@ -78,16 +94,15 @@ struct CameraView: View {
                 )
             }
         }
+        // Handle dismissal after confirmation
         .onChange(of: showConfirmation) { newValue in
             if !newValue {
-                // If saved → close CameraView entirely
                 if savedSuccessfully {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
                         if !showCamera {
                             dismiss()
                         }
                     }
-                    // If not saved >> reset image & reopen camera (Retake)
                 } else {
                     capturedImage = nil
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {

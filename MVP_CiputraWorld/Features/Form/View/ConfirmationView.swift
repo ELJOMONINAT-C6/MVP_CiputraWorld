@@ -22,7 +22,6 @@ struct ConfirmationView: View {
     let image: UIImage
     let onSave: () -> Void
 
-
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
@@ -55,27 +54,30 @@ struct ConfirmationView: View {
                                 .progressViewStyle(CircularProgressViewStyle(tint: .white))
                         }
                         Text(isSaving ? "Menyimpan..." : "Submit")
-                            .font(.headline)
+                            .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.accentColor)
+                    .background(Color(red: 15/255, green: 22/255, blue: 58/255)) // navy color
                     .foregroundColor(.white)
-                    .cornerRadius(10)
-                    .padding(.horizontal)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 24)
                 }
                 .disabled(isSaving)
                 
                 // Button if want to retake photo
                 Button(action: { dismiss() }) {
-                    Text("Foto Ulang")
-                        .font(.body)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color(.systemGray4))
-                        .foregroundColor(.primary)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
+                    HStack {
+                        Image(systemName: "camera.fill")
+                        Text("Foto Ulang")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.gray)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                    .padding(.horizontal, 24)
                 }
 
                 Spacer()
@@ -131,4 +133,17 @@ struct ConfirmationView: View {
             saveError = "Gagal menyimpan: \(error.localizedDescription)"
         }
     }
+}
+
+#Preview {
+    ConfirmationView(
+        machine: "AC-Unit-01",
+        date: Date(),
+        details: "Perlu pengecekan filter udara.",
+        notes: "Filter agak kotor, perlu dibersihkan.",
+        status: "Pending",
+        technician: "Nathan Gunawan",
+        image: UIImage(systemName: "wrench.and.screwdriver")!, // sample SF Symbol as placeholder
+        onSave: {}
+    )
 }

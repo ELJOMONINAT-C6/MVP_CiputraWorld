@@ -8,17 +8,13 @@
 import SwiftUI
 import SwiftData
 
-// View for Input Form
 struct InputView: View {
     @Environment(\.modelContext) private var context
     
-    // Defining Variables
     @State private var selectedMachine: String = ""
     @State private var maintenanceDate: Date = Date()
     @State private var maintenanceDetails: String = ""
     @State private var additionalNotes: String = ""
-    
-    // New fields
     @State private var maintenanceStatus: String = ""
     @State private var technicianName: String = ""
     
@@ -28,83 +24,119 @@ struct InputView: View {
     let machines = ["Machine A", "Machine B", "Machine C", "Machine D"]
     let statuses = ["Rusak", "Maintenance Selesai"]
     
-    
-    
     var body: some View {
         NavigationView {
-            // Form for Input Data
-            Form {
-                // Machine Picker
-                Section(header: Text("Machine")) {
-                    Picker("Select Machine", selection: $selectedMachine) {
-                        ForEach(machines, id: \.self) { machine in
-                            Text(machine).tag(machine)
+            VStack(spacing: 24) {
+                
+                // FORM CARD
+                VStack(alignment: .leading, spacing: 16) {
+                    
+                    // Machine Picker
+                    inputField(title: "Machine") {
+                        Picker("Select Machine", selection: $selectedMachine) {
+                            ForEach(machines, id: \.self) { machine in
+                                Text(machine).tag(machine)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                        
+                        if showValidationErrors && selectedMachine.isEmpty {
+                            validationMessage("Please select a machine")
                         }
                     }
                     
-                    if showValidationErrors && selectedMachine.isEmpty {
-                        validationMessage("Please select a machine")
+                    // Technician Name
+                    inputField(title: "Nama Teknisi") {
+                        TextField("Enter technician name", text: $technicianName)
+                            .padding(10)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
                     }
-                }
-                
-                // Date Picker
-                Section(header: Text("Date of Maintenance")) {
-                    DatePicker("Select Date", selection: $maintenanceDate, displayedComponents: .date)
-                }
-                
-                // Maintenance Details
-                Section(header: Text("Maintenance Details")) {
-                    TextEditor(text: $maintenanceDetails)
-                        .frame(height: 100)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
-                    if showValidationErrors && maintenanceDetails.isEmpty {
-                        validationMessage("Please enter details")
-                    }
-                }
-                
-                // Maintenance Status
-                Section(header: Text("Maintenance Status")) {
-                    Picker("Select Status", selection: $maintenanceStatus) {
-                        ForEach(statuses, id: \.self) { status in
-                            Text(status).tag(status)
-                        }
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
-                    
-                    if showValidationErrors && maintenanceStatus.isEmpty {
-                        validationMessage("Please select maintenance status")
-                    }
-                }
-                
-                // Technician Name
-                Section(header: Text("Nama Teknisi")) {
-                    TextField("Enter technician name", text: $technicianName)
                     if showValidationErrors && technicianName.isEmpty {
                         validationMessage("Please enter technician name")
                     }
-                }
-                
-                // Additional Notes
-                Section(header: Text("Additional Notes (Optional)")) {
-                    TextEditor(text: $additionalNotes)
-                        .frame(height: 80)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.3)))
-                }
-                
-                // Ambil Gambar Button
-                Section {
-                    Button(action: handleAmbilGambar) {
-                        HStack {
-                            Spacer()
-                            Text("Ambil Gambar")
-                                .font(.headline)
-                            Spacer()
+                    
+                    // Maintenance Details
+                    inputField(title: "Maintenance Details") {
+                        TextEditor(text: $maintenanceDetails)
+                            .frame(height: 80)
+                            .padding(6)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                    }
+                    if showValidationErrors && maintenanceDetails.isEmpty {
+                        validationMessage("Please enter details")
+                    }
+                    
+                    // Status Picker
+                    inputField(title: "Maintenance Status") {
+                        Picker("Select Status", selection: $maintenanceStatus) {
+                            ForEach(statuses, id: \.self) { status in
+                                Text(status).tag(status)
+                            }
                         }
+                        .pickerStyle(MenuPickerStyle())
+                        .padding(10)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                    }
+                    if showValidationErrors && maintenanceStatus.isEmpty {
+                        validationMessage("Please select maintenance status")
+                    }
+                    
+                    // Additional Notes
+                    inputField(title: "Additional Notes (Optional)") {
+                        TextEditor(text: $additionalNotes)
+                            .frame(height: 60)
+                            .padding(6)
+                            .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                    }
+                    
+                    // Date Picker
+                    inputField(title: "Tanggal") {
+                        DatePicker("", selection: $maintenanceDate, displayedComponents: .date)
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                            .padding(.horizontal, 8)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
+                    }
+                }
+                .padding()
+                .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
+                .padding(.horizontal)
+                
+                // SUBMIT BUTTON
+                Button(action: handleAmbilGambar) {
+                    HStack {
+                        Image(systemName: "camera")
+                        Text("Ambil Gambar")
+                            .fontWeight(.semibold)
+                    }
+                    .foregroundColor(.white)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemIndigo))
+                    .cornerRadius(10)
+                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .navigationTitle("Input Form")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    HStack {
+                        Text("Input Form")
+                            .font(.system(size: 24, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .leading) // aligns left
+                        Spacer()
                     }
                 }
             }
-            .navigationTitle("Input Form")
-            // Navigate to CameraView
             .background(
                 NavigationLink(
                     destination: CameraView(
@@ -116,16 +148,22 @@ struct InputView: View {
                         technician: technicianName
                     ),
                     isActive: $navigateToCamera
-                ) {
-                    EmptyView()
-                }
+                ) { EmptyView() }
                 .hidden()
             )
         }
     }
     
-    // Validation Helper
-    @ViewBuilder
+    // MARK: - Helpers
+    private func inputField<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+            content()
+        }
+    }
+    
     private func validationMessage(_ text: String) -> some View {
         HStack(spacing: 4) {
             Image(systemName: "exclamationmark.triangle.fill")
@@ -136,7 +174,6 @@ struct InputView: View {
         }
     }
     
-    // Logic for Proceeding to the Next Page
     private func handleAmbilGambar() {
         guard !selectedMachine.isEmpty,
               !maintenanceDetails.isEmpty,
@@ -149,10 +186,10 @@ struct InputView: View {
     }
 }
 
-// Preview
 struct InputView_Previews: PreviewProvider {
     static var previews: some View {
         InputView()
-            .modelContainer(for: HistoryItem.self, inMemory: true) // Preview only
+            .modelContainer(for: HistoryItem.self, inMemory: true)
     }
 }
+
