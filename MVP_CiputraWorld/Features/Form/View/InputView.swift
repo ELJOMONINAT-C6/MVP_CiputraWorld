@@ -26,129 +26,131 @@ struct InputView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 24) {
-                
-                // FORM CARD wrapped in ZStack
-                ZStack {
-                    VStack(alignment: .leading, spacing: 16) {
-                        
-                        // Machine Picker
-                        // Machine Picker
-                        inputField(title: "Machine") {
-                            FloatingDropdown(
-                                title: "Select Machine",
-                                selected: $selectedMachine,
-                                options: machines
-                            )
+            ScrollView {
+                VStack(spacing: 24) {
+                    
+                    // FORM CARD wrapped in ZStack
+                    ZStack {
+                        VStack(alignment: .leading, spacing: 16) {
+                            
+                            // Machine Picker
+                            // Machine Picker
+                            inputField(title: "Machine") {
+                                FloatingDropdown(
+                                    title: "Select Machine",
+                                    selected: $selectedMachine,
+                                    options: machines
+                                )
+                            }
+                            .zIndex(2) // 🔑 ensures dropdown is above other fields
+                            if showValidationErrors && selectedMachine.isEmpty {
+                                validationMessage("Please select a machine")
+                            }
+                            
+                            // Technician Name
+                            inputField(title: "Nama Teknisi") {
+                                TextField("Enter technician name", text: $technicianName)
+                                    .padding(10)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                            }
+                            if showValidationErrors && technicianName.isEmpty {
+                                validationMessage("Please enter technician name")
+                            }
+                            
+                            // Maintenance Details
+                            inputField(title: "Maintenance Details") {
+                                TextEditor(text: $maintenanceDetails)
+                                    .frame(height: 80)
+                                    .padding(6)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                            }
+                            if showValidationErrors && maintenanceDetails.isEmpty {
+                                validationMessage("Please enter details")
+                            }
+                            
+                            // Status Selection
+                            // Status Selection
+                            inputField(title: "Maintenance Status") {
+                                FloatingDropdown(
+                                    title: "Select Status",
+                                    selected: $maintenanceStatus,
+                                    options: statuses
+                                )
+                            }
+                            .zIndex(1) // slightly lower, so Machine dropdown can float above if both are open
+                            if showValidationErrors && maintenanceStatus.isEmpty {
+                                validationMessage("Please select maintenance status")
+                            }
+                            
+                            // Additional Notes
+                            inputField(title: "Additional Notes (Optional)") {
+                                TextEditor(text: $additionalNotes)
+                                    .frame(height: 60)
+                                    .padding(6)
+                                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                            }
+                            
+                            // Date Picker
+                            inputField(title: "Tanggal") {
+                                DatePicker("", selection: $maintenanceDate, displayedComponents: .date)
+                                    .labelsHidden()
+                                    .datePickerStyle(.compact)
+                                    .padding(.horizontal, 8)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
+                            }
                         }
-                        .zIndex(2) // 🔑 ensures dropdown is above other fields
-                        if showValidationErrors && selectedMachine.isEmpty {
-                            validationMessage("Please select a machine")
-                        }
-                        
-                        // Technician Name
-                        inputField(title: "Nama Teknisi") {
-                            TextField("Enter technician name", text: $technicianName)
-                                .padding(10)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
-                        }
-                        if showValidationErrors && technicianName.isEmpty {
-                            validationMessage("Please enter technician name")
-                        }
-                        
-                        // Maintenance Details
-                        inputField(title: "Maintenance Details") {
-                            TextEditor(text: $maintenanceDetails)
-                                .frame(height: 80)
-                                .padding(6)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
-                        }
-                        if showValidationErrors && maintenanceDetails.isEmpty {
-                            validationMessage("Please enter details")
-                        }
-                        
-                        // Status Selection
-                        // Status Selection
-                        inputField(title: "Maintenance Status") {
-                            FloatingDropdown(
-                                title: "Select Status",
-                                selected: $maintenanceStatus,
-                                options: statuses
-                            )
-                        }
-                        .zIndex(1) // slightly lower, so Machine dropdown can float above if both are open
-                        if showValidationErrors && maintenanceStatus.isEmpty {
-                            validationMessage("Please select maintenance status")
-                        }
-                        
-                        // Additional Notes
-                        inputField(title: "Additional Notes (Optional)") {
-                            TextEditor(text: $additionalNotes)
-                                .frame(height: 60)
-                                .padding(6)
-                                .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
-                        }
-                        
-                        // Date Picker
-                        inputField(title: "Tanggal") {
-                            DatePicker("", selection: $maintenanceDate, displayedComponents: .date)
-                                .labelsHidden()
-                                .datePickerStyle(.compact)
-                                .padding(.horizontal, 8)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
-                        }
+                        .padding()
+                        .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
+                        .padding(.horizontal)
                     }
-                    .padding()
-                    .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
+                    .zIndex(1) // form layer
+                    
+                    // SUBMIT BUTTON
+                    Button(action: handleAmbilGambar) {
+                        HStack {
+                            Image(systemName: "camera")
+                            Text("Ambil Gambar")
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color(.systemIndigo))
+                        .cornerRadius(10)
+                        .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
+                    }
                     .padding(.horizontal)
+                    
+                    Spacer()
                 }
-                .zIndex(1) // form layer
-                
-                // SUBMIT BUTTON
-                Button(action: handleAmbilGambar) {
-                    HStack {
-                        Image(systemName: "camera")
-                        Text("Ambil Gambar")
-                            .fontWeight(.semibold)
-                    }
-                    .foregroundColor(.white)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(.systemIndigo))
-                    .cornerRadius(10)
-                    .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                }
-                .padding(.horizontal)
-                
-                Spacer()
-            }
-            .navigationTitle("Input Form")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    HStack {
-                        Text("Input Form")
-                            .font(.system(size: 24, weight: .bold))
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Spacer()
+                .navigationTitle("Input Form")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .principal) {
+                        HStack {
+                            Text("Input Form")
+                                .font(.system(size: 24, weight: .bold))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            Spacer()
+                        }
                     }
                 }
+                .background(
+                    NavigationLink(
+                        destination: CameraView(
+                            machine: selectedMachine,
+                            date: maintenanceDate,
+                            details: maintenanceDetails,
+                            notes: additionalNotes,
+                            status: maintenanceStatus,
+                            technician: technicianName
+                        ),
+                        isActive: $navigateToCamera
+                    ) { EmptyView() }
+                        .hidden()
+                )
             }
-            .background(
-                NavigationLink(
-                    destination: CameraView(
-                        machine: selectedMachine,
-                        date: maintenanceDate,
-                        details: maintenanceDetails,
-                        notes: additionalNotes,
-                        status: maintenanceStatus,
-                        technician: technicianName
-                    ),
-                    isActive: $navigateToCamera
-                ) { EmptyView() }
-                .hidden()
-            )
         }
     }
     

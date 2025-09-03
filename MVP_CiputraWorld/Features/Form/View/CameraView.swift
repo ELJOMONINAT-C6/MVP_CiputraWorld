@@ -80,6 +80,8 @@ struct CameraView: View {
         // Confirmation view
         .fullScreenCover(isPresented: $showConfirmation) {
             if let imageForConfirm = capturedImage {
+                let processedImage = ImageProcessor.mergeImageWithTimestamp(image: imageForConfirm, timestamp: date)
+                
                 ConfirmationView(
                     machine: machine,
                     date: date,
@@ -87,7 +89,7 @@ struct CameraView: View {
                     notes: notes,
                     status: status,
                     technician: technician,
-                    image: imageForConfirm,
+                    image: processedImage,
                     onSave: {
                         savedSuccessfully = true
                     }
