@@ -104,10 +104,8 @@ struct MapView: View {
                         showingSearchResults = false
                         mapViewModel.searchText = ""
                     }
-                
+
                 VStack {
-                    Spacer()
-                    
                     EquipmentListView(
                         equipment: searchResults,
                         searchText: mapViewModel.searchText,
@@ -121,9 +119,13 @@ struct MapView: View {
                             mapViewModel.searchText = ""
                         }
                     )
-                    .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
+                    .frame(height: UIScreen.main.bounds.height * 0.55)
+                    .background(Color.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 }
+                .frame(maxHeight: .infinity, alignment: .bottom)
             }
+
         }
         .navigationTitle(floorName)
         .navigationBarTitleDisplayMode(.inline)
@@ -150,9 +152,8 @@ struct MapView: View {
         }
         .searchable(text: $mapViewModel.searchText, prompt: "Cari")
         .onAppear {
-            if equipmentDataViewModel.equipments.isEmpty {
-                equipmentStore.equipments.forEach { equipmentDataViewModel.add($0) }
-            }
+            // Selalu sync data dari EquipmentStore ke EquipmentDataViewModel
+            syncDataFromStore()
         }
         .onChange(of: mapViewModel.searchText) { _, newValue in
             showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
@@ -163,6 +164,16 @@ struct MapView: View {
         mapScale = 1.0
         mapOffset = .zero
         mapViewModel.clearSelection()
+    }
+    
+    private func syncDataFromStore() {
+        // Clear existing data
+        equipmentDataViewModel.equipments.removeAll()
+        
+        // Add all data from store
+        equipmentStore.equipments.forEach { equipment in
+            equipmentDataViewModel.add(equipment)
+        }
     }
 }
 

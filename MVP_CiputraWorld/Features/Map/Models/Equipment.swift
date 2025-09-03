@@ -8,15 +8,15 @@
 import Foundation
 import SwiftUI
 
-struct Equipment: Codable {
-    let assetID: String
-    let namaAlat: String
-    let lokasiPemasangan: String
-    let tanggalInstalasi: String
-    let masaGaransi: String
-    var imagePath: String?
-    var spesifikasi: [String: String] // key-value bebas
-}
+//struct Equipment: Codable {
+//    let assetID: String
+//    let namaAlat: String
+//    let lokasiPemasangan: String
+//    let tanggalInstalasi: String
+//    let masaGaransi: String
+//    var imagePath: String?
+//    var spesifikasi: [String: String] // key-value bebas
+//}
 
 class sampleEquipment: ObservableObject, Codable {
     @Published var assetID: String

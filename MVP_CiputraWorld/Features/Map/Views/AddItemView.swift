@@ -9,18 +9,19 @@ import SwiftUI
 import PhotosUI
 
 struct AddItemView: View {
-//    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var viewModel: EquipmentDataViewModel  // 🔥 Tambahkan ini
 
     // Form Fields
     @State private var namaItem = ""
     @State private var idBarang = ""
-    @State private var kategoriBarang = ""
+    @State private var lokasiBarang = ""
     @State private var customAttributes: [CustomAttribute] = []
     
     // State
     @State private var showValidationError = false
     @State private var showLocationPicker = false
+    @State private var showSuccessAlert = false
     
     // Foto
     @State private var selectedPhoto: PhotosPickerItem? = nil
@@ -32,27 +33,50 @@ struct AddItemView: View {
     private var isFormValid: Bool {
         !namaItem.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !idBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
-        !kategoriBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !lokasiBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    private func handleSubmit() {
-        if !isFormValid {
+    /// 🔥 Fungsi Save Item
+    private func handleSave() {
+        guard isFormValid else {
             showValidationError = true
-            let impact = UIImpactFeedbackGenerator(style: .medium)
-            impact.impactOccurred()
-        } else {
-            showValidationError = false
-            showLocationPicker = true
+            return
         }
+        
+        // Convert customAttributes ke Dictionary
+        var attributesDict = Dictionary(
+            uniqueKeysWithValues: customAttributes
+                .filter { !$0.key.isEmpty && !$0.value.isEmpty }
+                .map { ($0.key, $0.value) }
+        )
+        
+        // Masukkan lokasi (jika ada)
+        if let loc = selectedLocation {
+            attributesDict["xPosition"] = String(format: "%.4f", loc.x)
+            attributesDict["yPosition"] = String(format: "%.4f", loc.y)
+        }
+        
+        // Buat item baru
+        let newItem = sampleEquipment(
+            assetID: idBarang,
+            assetName: namaItem,
+            assetLocation: lokasiBarang,
+            assetSpecification: attributesDict
+        )
+        
+        // Simpan ke ViewModel
+        viewModel.add(newItem)
+        
+        // Tampilkan alert sukses
+        showSuccessAlert = true
     }
     
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Form
                     VStack(spacing: 20) {
-                        // Foto
+                        // FOTO
                         VStack {
                             if let image = selectedImage {
                                 ZStack(alignment: .topTrailing) {
@@ -101,15 +125,14 @@ struct AddItemView: View {
                         }
                         .onChange(of: selectedPhoto) { _, newPhoto in
                             Task {
-                                if let newPhoto = newPhoto {
-                                    if let data = try? await newPhoto.loadTransferable(type: Data.self) {
-                                        selectedImage = UIImage(data: data)
-                                    }
+                                if let newPhoto = newPhoto,
+                                   let data = try? await newPhoto.loadTransferable(type: Data.self) {
+                                    selectedImage = UIImage(data: data)
                                 }
                             }
                         }
                         
-                        // Fields
+                        // FIELD NAMA, ID, KATEGORI
                         RequiredFormField(
                             title: "Nama Item",
                             text: $namaItem,
@@ -127,17 +150,17 @@ struct AddItemView: View {
                         )
                         
                         RequiredFormField(
-                            title: "Kategori Barang",
-                            text: $kategoriBarang,
+                            title: "Lokasi Barang",
+                            text: $lokasiBarang,
                             placeholder: "Value",
-                            isEmpty: kategoriBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+                            isEmpty: lokasiBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                             showValidationError: showValidationError
                         )
                         
-                        // Specification
+                        // SPECIFICATION
                         SpecificationSection(customAttributes: $customAttributes)
                         
-                        // Preview Lokasi
+                        // PREVIEW LOKASI
                         if let location = selectedLocation {
                             VStack {
                                 Text("Lokasi Terpilih")
@@ -176,37 +199,42 @@ struct AddItemView: View {
                     
                     Spacer(minLength: 100)
                     
-                    // Tombol Edit Lokasi
-                    if selectedLocation != nil {
-                        Button(action: {
-                            showLocationPicker = true
-                        }) {
-                            Text("Edit Lokasi")
+                    //Edit lokasi
+                    if selectedLocation != nil { Button(action: { showLocationPicker = true }) { Text("Edit Lokasi") .font(.system(size: 16, weight: .medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
+                    
+                    //Tambah Lokasi & Simpan
+                    if selectedLocation == nil {
+                        NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
+                            Text("Tambahkan Lokasi")
                                 .font(.system(size: 16, weight: .medium))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
-                                .background(Color.gray)
+                                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
                                 .cornerRadius(8)
-                                .padding(.horizontal, 20)
                         }
-                        .padding(.bottom, 10)
+                        .disabled(!isFormValid)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 34)
+                    } else {
+                        Button(action: handleSave) {
+                            Text("Simpan")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
+                                .cornerRadius(8)
+                        }
+                        .disabled(!isFormValid)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 34)
+                        .alert("Item berhasil ditambahkan", isPresented: $showSuccessAlert) {
+                            Button("OK") {
+                                dismiss()
+                            }
+                        }
                     }
-                    
-                    // Tombol tambah Lokasi
-                    NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
-                        Text(selectedLocation != nil ? "Simpan" : "Tambahkan Lokasi")  // Kondisi teks tombol
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 50)
-                            .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
-                            .cornerRadius(8)
-                    }
-                    .disabled(!isFormValid)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 34)
-
                     
                     if showValidationError && !isFormValid {
                         ErrorMessage()
@@ -215,6 +243,9 @@ struct AddItemView: View {
             }
             .navigationTitle("Tambahkan Item")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationDestination(isPresented: $showLocationPicker) {
+                LocationPickerView(selectedLocation: $selectedLocation)
+            }
         }
     }
 }
@@ -232,4 +263,5 @@ struct ErrorMessage: View {
 
 #Preview {
     AddItemView()
+        .environmentObject(EquipmentDataViewModel())
 }

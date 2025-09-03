@@ -37,17 +37,22 @@ struct LandingPageView: View {
             Group {
                 if showingSearchResults {
                     ScrollView {
-                        VStack(spacing: 16) {
+                        LazyVStack(spacing: 0) { // spacing 0 biar divider nempel
                             ForEach(searchResults, id: \.id) { equipment in
-                                EquipmentCardView(equipment: equipment) {
-                                    mapViewModel.selectedEquipment = equipment
-                                    showingSearchResults = false
-                                    mapViewModel.searchText = ""
+                                NavigationLink(destination: EquipmentDetailView(equipment: equipment)) {
+                                    EquipmentCardView(equipment: equipment)
+                                        .padding(.vertical, 8)
+                                        .padding(.horizontal)
                                 }
+                                .buttonStyle(.plain)
+                                
+                                Divider() // garis pemisah antar item
+                                    .padding(.leading) // biar rata dengan konten
                             }
                         }
-                        .padding(.horizontal)
+                        .background(Color.white)
                     }
+
                 } else {
                     ScrollView {
                         VStack(spacing: 16) {
@@ -82,16 +87,27 @@ struct LandingPageView: View {
                 MapView(floorName: selectedFloor)
             }
             .onAppear {
-                if equipmentDataViewModel.equipments.isEmpty {
-                    equipmentStore.equipments.forEach { equipmentDataViewModel.add($0) }
-                }
+                // Selalu sync data dari EquipmentStore ke EquipmentDataViewModel
+                syncDataFromStore()
             }
             .onChange(of: mapViewModel.searchText) { _, newValue in
                 showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
             }
         }
     }
+    
+    private func syncDataFromStore() {
+        // Clear existing data
+        equipmentDataViewModel.equipments.removeAll()
+        
+        // Add all data from store
+        equipmentStore.equipments.forEach { equipment in
+            equipmentDataViewModel.add(equipment)
+        }
+    }
 }
+
+
 
 #Preview {
     LandingPageView()

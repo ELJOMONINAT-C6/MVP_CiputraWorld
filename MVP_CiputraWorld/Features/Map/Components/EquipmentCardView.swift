@@ -9,7 +9,6 @@ import SwiftUI
 
 struct EquipmentCardView: View {
     let equipment: sampleEquipment
-    let onTap: () -> Void
     
     private var equipmentImage: String {
         if let imagePath = equipment.imagePath,
@@ -33,11 +32,16 @@ struct EquipmentCardView: View {
         HStack(spacing: 12) {
             // Equipment Image
             Group {
-                if let imagePath = equipment.imagePath,
-                   let savedImage = ImageManager.shared.loadImage(from: imagePath) {
-                    Image(uiImage: savedImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
+                if let imagePath = equipment.imagePath, !imagePath.isEmpty {
+                    if let uiImage = UIImage(named: imagePath) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    } else {
+                        Image(getDefaultImageName())
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                    }
                 } else {
                     Image(getDefaultImageName())
                         .resizable()
@@ -56,7 +60,6 @@ struct EquipmentCardView: View {
                     .fontWeight(.medium)
                     .lineLimit(1)
                 
-               
                 Text("ID: \(equipment.assetID)")
                     .font(.subheadline)
                     .padding(.horizontal, 8)
@@ -64,7 +67,6 @@ struct EquipmentCardView: View {
                     .background(Color(.systemGray5))
                     .cornerRadius(8)
                 
-              
                 Text("Lokasi: \(equipment.assetLocation)")
                     .font(.subheadline)
                     .padding(.horizontal, 8)
@@ -79,23 +81,6 @@ struct EquipmentCardView: View {
         .padding(12)
         .background(Color.white)
         .cornerRadius(8)
-        .onTapGesture {
-            onTap()
-        }
-    }
-    
-    private func formatDate(_ dateString: String) -> String {
-        let inputFormatter = DateFormatter()
-        inputFormatter.dateFormat = "yyyy-MM-dd"
-        
-        let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "dd MMM yyyy"
-        outputFormatter.locale = Locale(identifier: "id_ID")
-        
-        if let date = inputFormatter.date(from: dateString) {
-            return outputFormatter.string(from: date)
-        }
-        return dateString
     }
 }
 

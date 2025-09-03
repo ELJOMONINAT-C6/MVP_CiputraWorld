@@ -38,32 +38,10 @@ struct ContentView: View {
                 Label("Riwayat", systemImage: "note")
             }
         }
-        
-//        TabView {
-//            NavigationStack {
-//                LandingPageView()
-//            }
-//            .tabItem {
-//                Label("Denah", systemImage: "map")
-//            }
-//
-//            NavigationStack {
-//               InputView()
-//            }
-//            .tabItem {
-//                Label("Tambah", systemImage: "plus")
-//            }
-//
-//            NavigationStack {
-//                HistoryView()
-//            }
-//            .tabItem {
-//                Label("Riwayat", systemImage: "note")
-//            }
-//        }
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(EquipmentDataViewModel())
 }

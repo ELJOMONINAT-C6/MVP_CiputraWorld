@@ -34,20 +34,18 @@ struct EquipmentListView: View {
             .background(Color("darkblue"))
             
             // Equipment List
-            ScrollView {
-                VStack(spacing: 12) {
-                    ForEach(equipment) { item in
-                        EquipmentCardView(equipment: item) {
-                            onSelect(item)
-                        }
-                    }
+            List(equipment) { item in
+                NavigationLink(destination: EquipmentDetailView(equipment: item)) {
+                    EquipmentCardView(equipment: item)
+                        .padding(.vertical, 4)
                 }
-                .padding()
+                .buttonStyle(PlainButtonStyle())
             }
-            .background(Color.white)
+            .listStyle(.plain)
         }
         .cornerRadius(16, corners: [.topLeft, .topRight])
         .shadow(radius: 10)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 }
 

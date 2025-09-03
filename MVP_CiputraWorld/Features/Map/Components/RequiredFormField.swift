@@ -42,11 +42,11 @@ struct CustomAttributeRow: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 if attribute.isCompleted {
-                    Text(attribute.name.isEmpty ? "-" : attribute.name)
+                    Text(attribute.key.isEmpty ? "-" : attribute.key)
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.primary)
                 } else {
-                    TextField("Nama Atribut (contoh: Brand, Model, dll)", text: $attribute.name)
+                    TextField("Nama Atribut (contoh: Brand, Model, dll)", text: $attribute.key)
                         .font(.system(size: 16, weight: .regular))
                         .foregroundColor(.primary)
                         .textFieldStyle(AttributeNameTextFieldStyle())
@@ -106,7 +106,7 @@ struct SpecificationSection: View {
     
     private func addNewAttribute() {
         if let last = customAttributes.last, !last.isCompleted {
-            if !last.name.isEmpty && !last.value.isEmpty {
+            if !last.key.isEmpty && !last.value.isEmpty {
                 if let index = customAttributes.firstIndex(where: { $0.id == last.id }) {
                     customAttributes[index].isCompleted = true
                 }

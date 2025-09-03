@@ -10,7 +10,7 @@ import Foundation
 // Model untuk custom attribute
 struct CustomAttribute: Identifiable {
     let id = UUID()
-    var name: String = ""
+    var key: String = ""
     var value: String = ""
     
     var isCompleted: Bool = false

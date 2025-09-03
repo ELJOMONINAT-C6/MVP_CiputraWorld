@@ -70,4 +70,14 @@ class EquipmentDataViewModel: ObservableObject {
             equipments = []
         }
     }
+    
+    func syncFromStore(_ store: EquipmentStore) {
+         equipments = store.equipments
+         save()
+     }
+     
+     func forceRefresh() {
+         // Trigger UI update
+         objectWillChange.send()
+     }
 }
