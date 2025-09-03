@@ -8,55 +8,43 @@
 import SwiftUI
 
 struct EquipmentDetailView: View {
-    let equipment: sampleEquipment  // Menggunakan sampleEquipment
+    @ObservedObject var equipment: sampleEquipment
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
         ScrollView {
             VStack(spacing: 20) {
                 // Equipment Image
-                Image("ac") // Ganti dengan nama image yang sesuai
-                    .resizable()
-                    .frame(height: 200)
-                    .background(Color.gray.opacity(0.1))
-                
-                // Equipment Image
-//                Group {
-//                    if let imagePath = equipment.imagePath,
-//                       let uiImage = ImageManager.shared.loadImage(from: imagePath) {
-//                        Image(uiImage: uiImage)
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fit)
-//                            .frame(height: 200)
-//                    } else {
-//                        // Fallback ke default image
-//                        Image(ImageManager.shared.getDefaultImage(for: equipment.equipmentType))
-//                            .resizable()
-//                            .aspectRatio(contentMode: .fit)
-//                            .frame(height: 200)
-//                    }
-//                }
-//                .background(Color.gray.opacity(0.1))
-//                .cornerRadius(12)
+                if let imagePath = equipment.imagePath, !imagePath.isEmpty {
+                    Image(uiImage: UIImage(named: imagePath) ?? UIImage())
+                        .resizable()
+                        .frame(height: 200)
+                        .background(Color.gray.opacity(0.1))
+                } else {
+                    Image("ac")
+                        .resizable()
+                        .frame(height: 200)
+                        .background(Color.gray.opacity(0.1))
+                }
                 
                 VStack() {
                     // Equipment Name and Basic Info
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(equipment.assetName)  // Menggunakan assetName
+                        Text(equipment.assetName)
                             .font(.title2)
                             .fontWeight(.bold)
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("ID: \(equipment.assetID)")  // Menggunakan assetID
+                            Text("ID: \(equipment.assetID)")
                                 .font(.body)
                             
-                            Text("Lokasi: \(equipment.assetLocation)")  // Menggunakan assetLocation
+                            Text("Lokasi: \(equipment.assetLocation)")
                                 .font(.body)
                             
-                            Text("Last Maintenance: \(formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? ""))")  // Menggunakan tanggalInstalasi dari assetSpecification
+                            Text("Last Maintenance: \(formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? ""))")
                                 .font(.body)
                             
-                            Text("Next Maintenance: \(formatDate(equipment.assetSpecification["masaGaransi"] ?? ""))")  // Menggunakan masaGaransi dari assetSpecification
+                            Text("Next Maintenance: \(formatDate(equipment.assetSpecification["masaGaransi"] ?? ""))")
                                 .font(.body)
                         }
                     }

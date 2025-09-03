@@ -147,13 +147,6 @@ struct LocationPickerView: View {
         }
         .navigationTitle("Tambahkan Item")
         .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(true)
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                BackButton {
-//                    dismiss() }
-//            }
-//        }
     }
 }
 

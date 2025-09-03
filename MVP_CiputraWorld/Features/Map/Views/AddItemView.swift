@@ -193,8 +193,7 @@ struct AddItemView: View {
                         .padding(.bottom, 10)
                     }
                     
-                    // Tombol Lokasi
-//                    AddLocationButton(isFormValid: isFormValid, action: handleSubmit, selectedLocation: $selectedLocation)
+                    // Tombol tambah Lokasi
                     NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
                         Text(selectedLocation != nil ? "Simpan" : "Tambahkan Lokasi")  // Kondisi teks tombol
                             .font(.system(size: 16, weight: .medium))
@@ -216,39 +215,7 @@ struct AddItemView: View {
             }
             .navigationTitle("Tambahkan Item")
             .navigationBarTitleDisplayMode(.inline)
-//            .navigationBarBackButtonHidden(true)
-//            .toolbar {
-//                ToolbarItem(placement: .navigationBarLeading) {
-//                    BackButton { presentationMode.wrappedValue.dismiss() }
-//                }
-//            }
-//            .navigationDestination(isPresented: $showLocationPicker) {
-//                LocationPickerView(selectedLocation: $selectedLocation, show: $showLocationPicker)
-//            }
         }
-    }
-}
-
-
-// MARK: - Supporting Views
-struct AddLocationButton: View {
-    let isFormValid: Bool
-    let action: () -> Void
-    @Binding var selectedLocation: CGPoint?  // Binding ke selectedLocation
-    
-    var body: some View {
-        Button(action: action) {
-            Text(selectedLocation != nil ? "Simpan" : "Tambahkan Lokasi")  // Kondisi teks tombol
-                .font(.system(size: 16, weight: .medium))
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
-                .cornerRadius(8)
-        }
-        .disabled(!isFormValid)
-        .padding(.horizontal, 20)
-        .padding(.bottom, 34)
     }
 }
 
@@ -262,22 +229,6 @@ struct ErrorMessage: View {
             .padding(.bottom, 10)
     }
 }
-
-//struct BackButton: View {
-//    let action: () -> Void
-//
-//    var body: some View {
-//        Button(action: action) {
-//            HStack(spacing: 6) {
-//                Image(systemName: "chevron.left")
-//                    .font(.system(size: 16, weight: .medium))
-//                Text("Kembali")
-//                    .font(.system(size: 17))
-//            }
-//            .foregroundColor(.blue)
-//        }
-//    }
-//}
 
 #Preview {
     AddItemView()

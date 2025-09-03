@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MapView: View {
+    @StateObject private var equipmentStore = EquipmentStore()
     @StateObject private var equipmentDataViewModel = EquipmentDataViewModel()
     @StateObject private var mapViewModel: EquipmentFilteringViewModel
     
@@ -28,12 +29,12 @@ struct MapView: View {
     }
     
     // Computed property untuk hasil search
-    private var searchResults: [sampleEquipment] {  // Menggunakan sampleEquipment
+    private var searchResults: [sampleEquipment] {
         if mapViewModel.searchText.isEmpty {
             return []
         }
         return equipmentDataViewModel.equipments.filter { equipment in
-            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||  // Menggunakan assetName
+            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
             equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
             equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
         }
@@ -68,6 +69,7 @@ struct MapView: View {
                             .offset(mapOffset)
                         }
                     }
+                    
                     // Zoom using 2 fingers
                     .gesture(
                         MagnificationGesture()
@@ -107,13 +109,12 @@ struct MapView: View {
                     Spacer()
                     
                     EquipmentListView(
-                        equipment: searchResults,  // Menggunakan searchResults yang baru
+                        equipment: searchResults,
                         searchText: mapViewModel.searchText,
                         onSelect: { selectedEquipment in
                             mapViewModel.selectedEquipment = selectedEquipment
                             showingSearchResults = false
                             mapViewModel.searchText = ""
-                            // Optional: Navigate ke detail
                         },
                         onDismiss: {
                             showingSearchResults = false
@@ -126,7 +127,6 @@ struct MapView: View {
         }
         .navigationTitle(floorName)
         .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(true)
         .toolbar {
 //            ToolbarItem(placement: .navigationBarLeading) {
 //                Button(action: {
@@ -150,9 +150,8 @@ struct MapView: View {
         }
         .searchable(text: $mapViewModel.searchText, prompt: "Cari")
         .onAppear {
-            // Load dummy data jika belum ada data
             if equipmentDataViewModel.equipments.isEmpty {
-                loadDummyData()
+                equipmentStore.equipments.forEach { equipmentDataViewModel.add($0) }
             }
         }
         .onChange(of: mapViewModel.searchText) { _, newValue in
@@ -164,13 +163,6 @@ struct MapView: View {
         mapScale = 1.0
         mapOffset = .zero
         mapViewModel.clearSelection()
-    }
-    
-    private func loadDummyData() {
-        // Load dummy data dari equipmentList yang sudah ada
-        for equipment in sampleEquipments {
-            equipmentDataViewModel.add(equipment)
-        }
     }
 }
 

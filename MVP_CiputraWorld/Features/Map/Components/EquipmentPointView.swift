@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct EquipmentPointView: View {
-    let equipment: sampleEquipment  // Menggunakan sampleEquipment
+    let equipment: sampleEquipment
     let geometrySize: CGSize
     let isSelected: Bool
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EquipmentCardView: View {
-    let equipment: sampleEquipment  // Menggunakan sampleEquipment
+    let equipment: sampleEquipment
     let onTap: () -> Void
     
     private var equipmentImage: String {
@@ -51,7 +51,7 @@ struct EquipmentCardView: View {
             
             // Equipment Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(equipment.assetName)  // Menggunakan assetName
+                Text(equipment.assetName)
                     .font(.body)
                     .fontWeight(.medium)
                     .lineLimit(1)

@@ -10,6 +10,7 @@ import SwiftUI
 struct LandingPageView: View {
     @State private var showingMap = false
     @State private var selectedFloor = ""
+    @StateObject private var equipmentStore = EquipmentStore()
     @StateObject private var equipmentDataViewModel = EquipmentDataViewModel()
     @StateObject private var mapViewModel: EquipmentFilteringViewModel
     
@@ -20,12 +21,12 @@ struct LandingPageView: View {
         _mapViewModel = StateObject(wrappedValue: EquipmentFilteringViewModel(equipmentViewModel: equipmentVM))
     }
     
-    private var searchResults: [sampleEquipment] {  // Menggunakan sampleEquipment
+    private var searchResults: [sampleEquipment] {
         if mapViewModel.searchText.isEmpty {
             return []
         }
         return equipmentDataViewModel.equipments.filter { equipment in
-            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||  // Menggunakan assetName
+            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
             equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
             equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
         }
@@ -76,24 +77,18 @@ struct LandingPageView: View {
                 }
             }
             .navigationTitle("Denah")
-            .searchable(text: $mapViewModel.searchText, prompt: "Cari barang apa?") // Search resmi SwiftUI
+            .searchable(text: $mapViewModel.searchText, prompt: "Cari barang apa?")
             .sheet(isPresented: $showingMap) {
                 MapView(floorName: selectedFloor)
             }
             .onAppear {
                 if equipmentDataViewModel.equipments.isEmpty {
-                    loadDummyData()
+                    equipmentStore.equipments.forEach { equipmentDataViewModel.add($0) }
                 }
             }
             .onChange(of: mapViewModel.searchText) { _, newValue in
                 showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
             }
-        }
-    }
-    
-    private func loadDummyData() {
-        for equipment in sampleEquipments {  // Menggunakan sampleEquipments yang baru
-            equipmentDataViewModel.add(equipment)
         }
     }
 }

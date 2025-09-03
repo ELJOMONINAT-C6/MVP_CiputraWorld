@@ -10,20 +10,20 @@ import Combine
 
 @MainActor
 class EquipmentFilteringViewModel: ObservableObject {
-    @Published var filteredEquipment: [sampleEquipment] = []  // Menggunakan sampleEquipment
+    @Published var filteredEquipment: [sampleEquipment] = []
     @Published var searchText: String = "" {
         didSet {
             filterEquipment()
         }
     }
     
-    @Published var selectedCategory: String? = nil { // Tambah ini untuk track category yang dipilih
+    @Published var selectedCategory: String? = nil {
         didSet {
             filterEquipment()
         }
     }
     
-    @Published var selectedEquipment: sampleEquipment?  // Menggunakan sampleEquipment
+    @Published var selectedEquipment: sampleEquipment?
     
     private var equipmentViewModel: EquipmentDataViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -67,14 +67,14 @@ class EquipmentFilteringViewModel: ObservableObject {
             // Filter by search text jika tidak kosong
             if !searchText.isEmpty {
                 matchesSearch = equipment.assetID.localizedCaseInsensitiveContains(searchText) ||
-                                equipment.assetName.localizedCaseInsensitiveContains(searchText)  // Menggunakan assetName
+                                equipment.assetName.localizedCaseInsensitiveContains(searchText)
             }
             
             return matchesCategory && matchesSearch
         }
     }
     
-    func selectEquipment(_ equipment: sampleEquipment) {  // Menggunakan sampleEquipment
+    func selectEquipment(_ equipment: sampleEquipment) {
         selectedEquipment = equipment
         searchText = equipment.assetID
     }
@@ -86,7 +86,7 @@ class EquipmentFilteringViewModel: ObservableObject {
         } else {
             // Pilih category baru
             selectedCategory = category
-            searchText = "" // Clear search text ketika pilih category
+            searchText = ""
         }
     }
     

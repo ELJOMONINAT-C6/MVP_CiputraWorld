@@ -41,7 +41,6 @@ struct CustomAttributeRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
-                // ✅ Name jadi Text kalau sudah completed
                 if attribute.isCompleted {
                     Text(attribute.name.isEmpty ? "-" : attribute.name)
                         .font(.system(size: 16, weight: .regular))
@@ -60,7 +59,6 @@ struct CustomAttributeRow: View {
                 }
             }
             
-            // ✅ Value tetap TextField walaupun completed
             TextField("Value", text: $attribute.value)
                 .textFieldStyle(CustomTextFieldStyle())
         }
@@ -107,18 +105,14 @@ struct SpecificationSection: View {
     }
     
     private func addNewAttribute() {
-        // Cek apakah ada atribut yang belum lengkap
         if let last = customAttributes.last, !last.isCompleted {
             if !last.name.isEmpty && !last.value.isEmpty {
-                // Mark completed kalau udah diisi
                 if let index = customAttributes.firstIndex(where: { $0.id == last.id }) {
                     customAttributes[index].isCompleted = true
                 }
-                // Tambahkan atribut baru
                 customAttributes.append(CustomAttribute())
             }
         } else {
-            // Kalau belum ada atau semua udah complete → tambah baru
             customAttributes.append(CustomAttribute())
         }
     }

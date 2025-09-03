@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct EquipmentListView: View {
-    let equipment: [sampleEquipment]  // Menggunakan sampleEquipment
+    let equipment: [sampleEquipment]
     let searchText: String
-    let onSelect: (sampleEquipment) -> Void  // Menggunakan sampleEquipment
+    let onSelect: (sampleEquipment) -> Void
     let onDismiss: () -> Void
     
     var body: some View {
@@ -37,7 +37,7 @@ struct EquipmentListView: View {
             ScrollView {
                 VStack(spacing: 12) {
                     ForEach(equipment) { item in
-                        EquipmentCardView(equipment: item) {  // Menggunakan sampleEquipment
+                        EquipmentCardView(equipment: item) {
                             onSelect(item)
                         }
                     }

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct Equipment: Codable {
     let assetID: String
@@ -18,13 +19,12 @@ struct Equipment: Codable {
 }
 
 class sampleEquipment: ObservableObject, Codable {
-    var assetID: String
-    var assetName: String
-    var assetLocation: String
-    var assetSpecification: [String: String]
-    var imagePath: String?
+    @Published var assetID: String
+    @Published var assetName: String
+    @Published var assetLocation: String
+    @Published var assetSpecification: [String: String]
+    @Published var imagePath: String?
     
-    // Inisialisasi properti
     init(assetID: String, assetName: String, assetLocation: String, assetSpecification: [String: String] = [:], imagePath: String? = nil) {
         self.assetID = assetID
         self.assetName = assetName
@@ -32,4 +32,26 @@ class sampleEquipment: ObservableObject, Codable {
         self.assetSpecification = assetSpecification
         self.imagePath = imagePath
     }
+    
+    enum CodingKeys: String, CodingKey {
+          case assetID, assetName, assetLocation, assetSpecification, imagePath
+      }
+      
+      required init(from decoder: Decoder) throws {
+          let container = try decoder.container(keyedBy: CodingKeys.self)
+          assetID = try container.decode(String.self, forKey: .assetID)
+          assetName = try container.decode(String.self, forKey: .assetName)
+          assetLocation = try container.decode(String.self, forKey: .assetLocation)
+          assetSpecification = try container.decode([String: String].self, forKey: .assetSpecification)
+          imagePath = try container.decodeIfPresent(String.self, forKey: .imagePath)
+      }
+      
+      func encode(to encoder: Encoder) throws {
+          var container = encoder.container(keyedBy: CodingKeys.self)
+          try container.encode(assetID, forKey: .assetID)
+          try container.encode(assetName, forKey: .assetName)
+          try container.encode(assetLocation, forKey: .assetLocation)
+          try container.encode(assetSpecification, forKey: .assetSpecification)
+          try container.encode(imagePath, forKey: .imagePath)
+      }
 }

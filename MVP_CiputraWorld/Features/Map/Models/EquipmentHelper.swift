@@ -22,8 +22,8 @@ extension sampleEquipment: Identifiable {
     
     // For Metadata
     var equipmentType: String {
-        let components = assetName.split(separator: " ")  // Memisahkan berdasarkan spasi
-        return components.first.map { String($0) } ?? "Unknown"  // Ambil kata pertama
+        let components = assetName.split(separator: " ")
+        return components.first.map { String($0) } ?? "Unknown"
     }
     
     var floor: Int {
