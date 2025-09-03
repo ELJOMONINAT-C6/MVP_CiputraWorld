@@ -16,28 +16,28 @@ struct CategoryFilterView: View {
         HStack(spacing: 12) {
             CategoryLabel(
                 color: Color("blue-cw"),
-                text: "AC",
-                isSelected: mapViewModel.selectedCategory == "AC",
+                text: "AHU",
+                isSelected: mapViewModel.selectedCategory == "AHU",
                 onTap: {
-                    mapViewModel.selectCategory("AC")
+                    mapViewModel.selectCategory("AHU")
                 }
             )
             
             CategoryLabel(
                 color: Color("red-point"),
-                text: "HCU",
-                isSelected: mapViewModel.selectedCategory == "HCU",
+                text: "FAN",
+                isSelected: mapViewModel.selectedCategory == "FAN",
                 onTap: {
-                    mapViewModel.selectCategory("HCU")
+                    mapViewModel.selectCategory("FAN")
                 }
             )
             
             CategoryLabel(
                 color: Color("green-point"),
-                text: "CCTV",
-                isSelected: mapViewModel.selectedCategory == "CCTV",
+                text: "AC",
+                isSelected: mapViewModel.selectedCategory == "AC",
                 onTap: {
-                    mapViewModel.selectCategory("CCTV")
+                    mapViewModel.selectCategory("AC")
                 }
             )
         }

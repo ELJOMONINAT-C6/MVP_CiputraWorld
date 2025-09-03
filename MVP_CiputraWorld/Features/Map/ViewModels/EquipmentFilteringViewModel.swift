@@ -10,7 +10,7 @@ import Combine
 
 @MainActor
 class EquipmentFilteringViewModel: ObservableObject {
-    @Published var filteredEquipment: [Equipment] = []
+    @Published var filteredEquipment: [sampleEquipment] = []  // Menggunakan sampleEquipment
     @Published var searchText: String = "" {
         didSet {
             filterEquipment()
@@ -23,7 +23,7 @@ class EquipmentFilteringViewModel: ObservableObject {
         }
     }
     
-    @Published var selectedEquipment: Equipment?
+    @Published var selectedEquipment: sampleEquipment?  // Menggunakan sampleEquipment
     
     private var equipmentViewModel: EquipmentDataViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -55,49 +55,40 @@ class EquipmentFilteringViewModel: ObservableObject {
         let allEquipment = equipmentViewModel.equipments
         
         // Filter berdasarkan category dan search text
-               filteredEquipment = allEquipment.filter { equipment in
-                   var matchesCategory = true
-                   var matchesSearch = true
-                   
-                   // Filter by category jika ada yang dipilih
-                   if let category = selectedCategory {
-                       matchesCategory = equipment.equipmentType == category
-                   }
-                   
-                   // Filter by search text jika tidak kosong
-                   if !searchText.isEmpty {
-                       matchesSearch = equipment.assetID.localizedCaseInsensitiveContains(searchText) ||
-                                      equipment.namaAlat.localizedCaseInsensitiveContains(searchText)
-                   }
-                   
-                   return matchesCategory && matchesSearch
-               }
-        
-//        if searchText.isEmpty {
-//            filteredEquipment = allEquipment
-//        } else {
-//            filteredEquipment = allEquipment.filter {
-//                $0.assetID.localizedCaseInsensitiveContains(searchText) ||
-//                $0.namaAlat.localizedCaseInsensitiveContains(searchText)
-//            }
-//        }
+        filteredEquipment = allEquipment.filter { equipment in
+            var matchesCategory = true
+            var matchesSearch = true
+            
+            // Filter by category jika ada yang dipilih
+            if let category = selectedCategory {
+                matchesCategory = equipment.equipmentType == category
+            }
+            
+            // Filter by search text jika tidak kosong
+            if !searchText.isEmpty {
+                matchesSearch = equipment.assetID.localizedCaseInsensitiveContains(searchText) ||
+                                equipment.assetName.localizedCaseInsensitiveContains(searchText)  // Menggunakan assetName
+            }
+            
+            return matchesCategory && matchesSearch
+        }
     }
     
-    func selectEquipment(_ equipment: Equipment) {
+    func selectEquipment(_ equipment: sampleEquipment) {  // Menggunakan sampleEquipment
         selectedEquipment = equipment
         searchText = equipment.assetID
     }
     
     func selectCategory(_ category: String) {
-            if selectedCategory == category {
-                // Jika category yang sama diklik lagi, deselect (clear filter)
-                selectedCategory = nil
-            } else {
-                // Pilih category baru
-                selectedCategory = category
-                searchText = "" // Clear search text ketika pilih category
-            }
+        if selectedCategory == category {
+            // Jika category yang sama diklik lagi, deselect (clear filter)
+            selectedCategory = nil
+        } else {
+            // Pilih category baru
+            selectedCategory = category
+            searchText = "" // Clear search text ketika pilih category
         }
+    }
     
     func clearSelection() {
         selectedEquipment = nil
@@ -105,3 +96,4 @@ class EquipmentFilteringViewModel: ObservableObject {
         searchText = ""
     }
 }
+

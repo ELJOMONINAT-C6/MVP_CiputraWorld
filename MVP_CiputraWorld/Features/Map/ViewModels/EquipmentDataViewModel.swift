@@ -10,34 +10,34 @@ import SwiftUI
 
 @MainActor
 class EquipmentDataViewModel: ObservableObject {
-    @Published var equipments: [Equipment] = []
+    @Published var equipments: [sampleEquipment] = []  // Menggunakan sampleEquipment
     private let filename = "equipment.json"
     
     init() {
         load()
     }
     
-    func add(_ item: Equipment) {
+    func add(_ item: sampleEquipment) {  // Menggunakan sampleEquipment
         equipments.append(item)
         save()
     }
     
-    func update(_ item: Equipment) {
+    func update(_ item: sampleEquipment) {  // Menggunakan sampleEquipment
         if let idx = equipments.firstIndex(where: { $0.assetID == item.assetID }) {
             equipments[idx] = item
             save()
         }
     }
     
-    func remove(_ item: Equipment) {
+    func remove(_ item: sampleEquipment) {  // Menggunakan sampleEquipment
         equipments.removeAll { $0.assetID == item.assetID }
         save()
     }
     
-    func search(by keyword: String) -> [Equipment] {
+    func search(by keyword: String) -> [sampleEquipment] {  // Menggunakan sampleEquipment
         equipments.filter {
             keyword.isEmpty ||
-            $0.namaAlat.localizedCaseInsensitiveContains(keyword) ||
+            $0.assetName.localizedCaseInsensitiveContains(keyword) ||  // Menggunakan assetName
             $0.assetID.localizedCaseInsensitiveContains(keyword)
         }
     }
@@ -64,7 +64,7 @@ class EquipmentDataViewModel: ObservableObject {
         }
         do {
             let data = try Data(contentsOf: url)
-            equipments = try JSONDecoder().decode([Equipment].self, from: data)
+            equipments = try JSONDecoder().decode([sampleEquipment].self, from: data)  // Menggunakan sampleEquipment
         } catch {
             print("Load error:", error)
             equipments = []

@@ -20,12 +20,12 @@ struct LandingPageView: View {
         _mapViewModel = StateObject(wrappedValue: EquipmentFilteringViewModel(equipmentViewModel: equipmentVM))
     }
     
-    private var searchResults: [Equipment] {
+    private var searchResults: [sampleEquipment] {  // Menggunakan sampleEquipment
         if mapViewModel.searchText.isEmpty {
             return []
         }
         return equipmentDataViewModel.equipments.filter { equipment in
-            equipment.namaAlat.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
+            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||  // Menggunakan assetName
             equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
             equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
         }
@@ -92,7 +92,7 @@ struct LandingPageView: View {
     }
     
     private func loadDummyData() {
-        for equipment in equipmentList {
+        for equipment in sampleEquipments {  // Menggunakan sampleEquipments yang baru
             equipmentDataViewModel.add(equipment)
         }
     }

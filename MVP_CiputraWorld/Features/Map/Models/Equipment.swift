@@ -16,3 +16,20 @@ struct Equipment: Codable {
     var imagePath: String?
     var spesifikasi: [String: String] // key-value bebas
 }
+
+class sampleEquipment: ObservableObject, Codable {
+    var assetID: String
+    var assetName: String
+    var assetLocation: String
+    var assetSpecification: [String: String]
+    var imagePath: String?
+    
+    // Inisialisasi properti
+    init(assetID: String, assetName: String, assetLocation: String, assetSpecification: [String: String] = [:], imagePath: String? = nil) {
+        self.assetID = assetID
+        self.assetName = assetName
+        self.assetLocation = assetLocation
+        self.assetSpecification = assetSpecification
+        self.imagePath = imagePath
+    }
+}

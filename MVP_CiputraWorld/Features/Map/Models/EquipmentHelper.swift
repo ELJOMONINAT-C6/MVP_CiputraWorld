@@ -8,30 +8,30 @@
 import Foundation
 import UIKit
 
-extension Equipment: Identifiable {
+extension sampleEquipment: Identifiable {
     var id: String { assetID }
     
     // Position (get from specification)
     var xPosition: Double {
-        Double(spesifikasi["xPosition"] ?? "0") ?? 0
+        Double(assetSpecification["xPosition"] ?? "0") ?? 0
     }
     
     var yPosition: Double {
-        Double(spesifikasi["yPosition"] ?? "0") ?? 0
+        Double(assetSpecification["yPosition"] ?? "0") ?? 0
     }
     
     // For Metadata
     var equipmentType: String {
-        let components = assetID.components(separatedBy: "-")
-        return components.first ?? "Unknown"
+        let components = assetName.split(separator: " ")  // Memisahkan berdasarkan spasi
+        return components.first.map { String($0) } ?? "Unknown"  // Ambil kata pertama
     }
     
     var floor: Int {
-        if lokasiPemasangan.lowercased().contains("lantai 1") {
+        if assetLocation.lowercased().contains("lantai 1") {
             return 1
-        } else if lokasiPemasangan.lowercased().contains("lantai 2") {
+        } else if assetLocation.lowercased().contains("lantai 2") {
             return 2
-        } else if lokasiPemasangan.lowercased().contains("lantai 3") {
+        } else if assetLocation.lowercased().contains("lantai 3") {
             return 3
         }
         return 1 // default lantai 1
@@ -41,7 +41,7 @@ extension Equipment: Identifiable {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         
-        guard let warrantyDate = formatter.date(from: masaGaransi) else { return true }
+        guard let warrantyDate = formatter.date(from: assetSpecification["masaGaransi"] ?? "") else { return true }
         return warrantyDate > Date()
     }
 }
@@ -80,3 +80,4 @@ class ImageManager {
         }
     }
 }
+

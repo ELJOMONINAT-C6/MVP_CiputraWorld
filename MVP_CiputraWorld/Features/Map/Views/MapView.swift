@@ -17,7 +17,6 @@ struct MapView: View {
     
     @State private var showingSearchResults = false
     
-    @Environment(\.dismiss) var dismiss
     
     let floorName: String
     
@@ -29,18 +28,17 @@ struct MapView: View {
     }
     
     // Computed property untuk hasil search
-        private var searchResults: [Equipment] {
-            if mapViewModel.searchText.isEmpty {
-                return []
-            }
-            return equipmentDataViewModel.equipments.filter { equipment in
-                equipment.namaAlat.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-                equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-                equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
-            }
+    private var searchResults: [sampleEquipment] {  // Menggunakan sampleEquipment
+        if mapViewModel.searchText.isEmpty {
+            return []
         }
+        return equipmentDataViewModel.equipments.filter { equipment in
+            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||  // Menggunakan assetName
+            equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
+            equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
+        }
+    }
 
-    
     var body: some View {
         ZStack {
             ZStack(alignment: .top) {
@@ -109,7 +107,7 @@ struct MapView: View {
                     Spacer()
                     
                     EquipmentListView(
-                        equipment: searchResults,
+                        equipment: searchResults,  // Menggunakan searchResults yang baru
                         searchText: mapViewModel.searchText,
                         onSelect: { selectedEquipment in
                             mapViewModel.selectedEquipment = selectedEquipment
@@ -125,36 +123,32 @@ struct MapView: View {
                     .frame(maxHeight: UIScreen.main.bounds.height * 0.6)
                 }
             }
-    }
+        }
         .navigationTitle(floorName)
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(true)
+//        .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack {
-                       Image(systemName: "chevron.left")
-                       Text("Kembali")
-                   }
-                }
-            }
+//            ToolbarItem(placement: .navigationBarLeading) {
+//                Button(action: {
+//                    dismiss()
+//                }) {
+//                    HStack {
+//                       Image(systemName: "chevron.left")
+//                       Text("Kembali")
+//                   }
+//                }
+//            }
             
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button("Reset") {
-                    resetMapView()
+                NavigationLink(destination: AddItemView()) {
+                    Image(systemName: "plus.square.fill.on.square.fill")
+                        .font(.system(size: 20))
+                        .symbolRenderingMode(.monochrome)
+                        .foregroundColor(.blue)
                 }
             }
         }
         .searchable(text: $mapViewModel.searchText, prompt: "Cari")
-        
-//        .sheet(isPresented: $showingEquipmentDetail) {
-//            if let selectedEquipment = mapViewModel.selectedEquipment {
-//                EquipmentDetailView(equipment: selectedEquipment)
-//            }
-//        }
-        
         .onAppear {
             // Load dummy data jika belum ada data
             if equipmentDataViewModel.equipments.isEmpty {
@@ -162,7 +156,7 @@ struct MapView: View {
             }
         }
         .onChange(of: mapViewModel.searchText) { _, newValue in
-                    showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
+            showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
         }
     }
     
@@ -174,7 +168,7 @@ struct MapView: View {
     
     private func loadDummyData() {
         // Load dummy data dari equipmentList yang sudah ada
-        for equipment in equipmentList {
+        for equipment in sampleEquipments {
             equipmentDataViewModel.add(equipment)
         }
     }
@@ -185,3 +179,4 @@ struct MapView_Previews: PreviewProvider {
         MapView()
     }
 }
+

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EquipmentDetailView: View {
-    let equipment: Equipment
+    let equipment: sampleEquipment  // Menggunakan sampleEquipment
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {
@@ -42,21 +42,21 @@ struct EquipmentDetailView: View {
                 VStack() {
                     // Equipment Name and Basic Info
                     VStack(alignment: .leading, spacing: 16) {
-                        Text(equipment.namaAlat)
+                        Text(equipment.assetName)  // Menggunakan assetName
                             .font(.title2)
                             .fontWeight(.bold)
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("ID: \(equipment.assetID)")
+                            Text("ID: \(equipment.assetID)")  // Menggunakan assetID
                                 .font(.body)
                             
-                            Text("Lokasi: \(equipment.lokasiPemasangan)")
+                            Text("Lokasi: \(equipment.assetLocation)")  // Menggunakan assetLocation
                                 .font(.body)
                             
-                            Text("Last Maintenance: \(formatDate(equipment.tanggalInstalasi))")
+                            Text("Last Maintenance: \(formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? ""))")  // Menggunakan tanggalInstalasi dari assetSpecification
                                 .font(.body)
                             
-                            Text("Next Maintenance: \(formatDate(equipment.masaGaransi))")
+                            Text("Next Maintenance: \(formatDate(equipment.assetSpecification["masaGaransi"] ?? ""))")  // Menggunakan masaGaransi dari assetSpecification
                                 .font(.body)
                         }
                     }
@@ -68,23 +68,12 @@ struct EquipmentDetailView: View {
                             .font(.title3)
                             .fontWeight(.semibold)
                         
-//                        VStack(alignment: .leading, spacing: 8) {
-//                            // Hardcoded specifications based on image
-//                            SpecificationRow(title: "Brand / Manufacturer:", value: "Panasonic")
-//                            SpecificationRow(title: "Model Number:", value: "")
-//                            SpecificationRow(title: "Serial Number:", value: "")
-//                            SpecificationRow(title: "Capacity:", value: "2PK")
-//                            SpecificationRow(title: "Power Consumption:", value: "200 Watt")
-//                            SpecificationRow(title: "Voltage / Phase:", value: "220V")
-//                            SpecificationRow(title: "Refrigerant Type:", value: "R32")
-//                            SpecificationRow(title: "Cooling Area Coverage:", value: "50m2")
-//                        }
                         VStack(alignment: .leading, spacing: 8) {
-                                ForEach(Array(equipment.spesifikasi.keys.sorted().filter { $0 != "xPosition" && $0 != "yPosition" }), id: \.self) { key in
-                                    if let value = equipment.spesifikasi[key], !value.isEmpty {
-                                        SpecificationRow(title: "\(key):", value: value)
-                                    }
+                            ForEach(Array(equipment.assetSpecification.keys.sorted().filter { $0 != "xPosition" && $0 != "yPosition" }), id: \.self) { key in
+                                if let value = equipment.assetSpecification[key], !value.isEmpty {
+                                    SpecificationRow(title: "\(key):", value: value)
                                 }
+                            }
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -159,3 +148,4 @@ struct SpecificationRow: View {
         }
     }
 }
+

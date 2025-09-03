@@ -1,6 +1,6 @@
 //
 //  ContentView.swift
-//  explore-map
+//  MVP_CiputraWorld
 //
 //  Created by Niken Larasati on 22/08/25.
 //
@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selectedTab = 0
     
     //for styling tab bar
     init() {
@@ -21,28 +22,45 @@ struct ContentView: View {
     }
     
     var body: some View {
-        TabView {
-            NavigationStack {
-                LandingPageView()
-            }
+        TabView(selection: $selectedTab) {
+            LandingPageView()
             .tabItem {
                 Label("Denah", systemImage: "map")
             }
 
-            NavigationStack {
-               InputView()
-            }
+            InputView()
             .tabItem {
                 Label("Tambah", systemImage: "plus")
             }
 
-            NavigationStack {
-                HistoryView()
-            }
+            HistoryView()
             .tabItem {
                 Label("Riwayat", systemImage: "note")
             }
         }
+        
+//        TabView {
+//            NavigationStack {
+//                LandingPageView()
+//            }
+//            .tabItem {
+//                Label("Denah", systemImage: "map")
+//            }
+//
+//            NavigationStack {
+//               InputView()
+//            }
+//            .tabItem {
+//                Label("Tambah", systemImage: "plus")
+//            }
+//
+//            NavigationStack {
+//                HistoryView()
+//            }
+//            .tabItem {
+//                Label("Riwayat", systemImage: "note")
+//            }
+//        }
     }
 }
 

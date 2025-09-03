@@ -6,57 +6,115 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct AddItemView: View {
-    @Environment(\.presentationMode) var presentationMode
-    
-    // MARK: - State Variables
+//    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
+
+    // Form Fields
     @State private var namaItem = ""
     @State private var idBarang = ""
     @State private var kategoriBarang = ""
     @State private var customAttributes: [CustomAttribute] = []
-    @State private var showValidationError = false
     
-    // MARK: - Computed Properties
+    // State
+    @State private var showValidationError = false
+    @State private var showLocationPicker = false
+    
+    // Foto
+    @State private var selectedPhoto: PhotosPickerItem? = nil
+    @State private var selectedImage: UIImage? = nil
+    
+    // Lokasi
+    @State private var selectedLocation: CGPoint? = nil
+    
     private var isFormValid: Bool {
         !namaItem.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !idBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty &&
         !kategoriBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    // MARK: - Helper Functions
-    private func isFieldEmpty(_ field: String) -> Bool {
-        field.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-    }
-    
     private func handleSubmit() {
         if !isFormValid {
             showValidationError = true
-            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-            impactFeedback.impactOccurred()
+            let impact = UIImpactFeedbackGenerator(style: .medium)
+            impact.impactOccurred()
         } else {
             showValidationError = false
-            print("Form valid, proceeding...")
-            print("Custom Attributes: \(customAttributes)")
-            // Add your submit logic here
+            showLocationPicker = true
         }
     }
     
-    // MARK: - Body
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(spacing: 0) {
-                    // Form Container
+                    // Form
                     VStack(spacing: 20) {
-                        // TODO: Add photo section here
+                        // Foto
+                        VStack {
+                            if let image = selectedImage {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(height: 200)
+                                        .frame(maxWidth: .infinity)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                    
+                                    Button {
+                                        selectedImage = nil
+                                        selectedPhoto = nil
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.white)
+                                            .background(Color.black.opacity(0.6))
+                                            .clipShape(Circle())
+                                    }
+                                    .padding(8)
+                                }
+                                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                                    Text("Ganti Foto")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.blue)
+                                }
+                            } else {
+                                PhotosPicker(selection: $selectedPhoto, matching: .images) {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .strokeBorder(style: StrokeStyle(lineWidth: 1, dash: [5]))
+                                        .foregroundColor(.gray)
+                                        .frame(height: 200)
+                                        .overlay(
+                                            VStack {
+                                                Image(systemName: "photo.on.rectangle.angled")
+                                                    .font(.system(size: 40))
+                                                    .foregroundColor(.gray)
+                                                Text("Pilih Foto")
+                                                    .font(.system(size: 16))
+                                                    .foregroundColor(.gray)
+                                            }
+                                        )
+                                }
+                            }
+                        }
+                        .onChange(of: selectedPhoto) { _, newPhoto in
+                            Task {
+                                if let newPhoto = newPhoto {
+                                    if let data = try? await newPhoto.loadTransferable(type: Data.self) {
+                                        selectedImage = UIImage(data: data)
+                                    }
+                                }
+                            }
+                        }
                         
-                        // Required Fields
+                        // Fields
                         RequiredFormField(
                             title: "Nama Item",
                             text: $namaItem,
                             placeholder: "Value",
-                            isEmpty: isFieldEmpty(namaItem),
+                            isEmpty: namaItem.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                             showValidationError: showValidationError
                         )
                         
@@ -64,7 +122,7 @@ struct AddItemView: View {
                             title: "ID Barang",
                             text: $idBarang,
                             placeholder: "Value",
-                            isEmpty: isFieldEmpty(idBarang),
+                            isEmpty: idBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                             showValidationError: showValidationError
                         )
                         
@@ -72,15 +130,42 @@ struct AddItemView: View {
                             title: "Kategori Barang",
                             text: $kategoriBarang,
                             placeholder: "Value",
-                            isEmpty: isFieldEmpty(kategoriBarang),
+                            isEmpty: kategoriBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                             showValidationError: showValidationError
                         )
                         
-                        // Specification Section
+                        // Specification
                         SpecificationSection(customAttributes: $customAttributes)
+                        
+                        // Preview Lokasi
+                        if let location = selectedLocation {
+                            VStack {
+                                Text("Lokasi Terpilih")
+                                    .font(.headline)
+                                GeometryReader { geo in
+                                    if let uiImage = UIImage(named: "map") {
+                                        let imageSize = uiImage.size
+                                        ZStack {
+                                            Image("map")
+                                                .resizable()
+                                                .scaledToFit()
+                                            
+                                            let point = location.positionIn(imageSize: imageSize, geoSize: geo.size)
+                                            Circle()
+                                                .fill(Color.blue)
+                                                .frame(width: 20, height: 20)
+                                                .position(point)
+                                        }
+                                    }
+                                }
+                                .frame(height: 200)
+                                .cornerRadius(8)
+                            }
+                            .padding(.vertical)
+                        }
                     }
                     .padding(16)
-                    .background(Color(.white))
+                    .background(Color.white)
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 6)
@@ -91,13 +176,39 @@ struct AddItemView: View {
                     
                     Spacer(minLength: 100)
                     
-                    // Submit Button
-                    SubmitButton(
-                        isFormValid: isFormValid,
-                        action: handleSubmit
-                    )
+                    // Tombol Edit Lokasi
+                    if selectedLocation != nil {
+                        Button(action: {
+                            showLocationPicker = true
+                        }) {
+                            Text("Edit Lokasi")
+                                .font(.system(size: 16, weight: .medium))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(Color.gray)
+                                .cornerRadius(8)
+                                .padding(.horizontal, 20)
+                        }
+                        .padding(.bottom, 10)
+                    }
                     
-                    // Error Message
+                    // Tombol Lokasi
+//                    AddLocationButton(isFormValid: isFormValid, action: handleSubmit, selectedLocation: $selectedLocation)
+                    NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
+                        Text(selectedLocation != nil ? "Simpan" : "Tambahkan Lokasi")  // Kondisi teks tombol
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
+                            .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
+                            .cornerRadius(8)
+                    }
+                    .disabled(!isFormValid)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 34)
+
+                    
                     if showValidationError && !isFormValid {
                         ErrorMessage()
                     }
@@ -105,27 +216,29 @@ struct AddItemView: View {
             }
             .navigationTitle("Tambahkan Item")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    BackButton {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                }
-            }
+//            .navigationBarBackButtonHidden(true)
+//            .toolbar {
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    BackButton { presentationMode.wrappedValue.dismiss() }
+//                }
+//            }
+//            .navigationDestination(isPresented: $showLocationPicker) {
+//                LocationPickerView(selectedLocation: $selectedLocation, show: $showLocationPicker)
+//            }
         }
-        .navigationViewStyle(StackNavigationViewStyle())
     }
 }
 
+
 // MARK: - Supporting Views
-struct SubmitButton: View {
+struct AddLocationButton: View {
     let isFormValid: Bool
     let action: () -> Void
+    @Binding var selectedLocation: CGPoint?  // Binding ke selectedLocation
     
     var body: some View {
         Button(action: action) {
-            Text("Tambahkan Lokasi")
+            Text(selectedLocation != nil ? "Simpan" : "Tambahkan Lokasi")  // Kondisi teks tombol
                 .font(.system(size: 16, weight: .medium))
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -139,6 +252,7 @@ struct SubmitButton: View {
     }
 }
 
+
 struct ErrorMessage: View {
     var body: some View {
         Text("Mohon lengkapi semua field yang wajib diisi (*)")
@@ -149,21 +263,21 @@ struct ErrorMessage: View {
     }
 }
 
-struct BackButton: View {
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .medium))
-                Text("Kembali")
-                    .font(.system(size: 17))
-            }
-            .foregroundColor(.blue)
-        }
-    }
-}
+//struct BackButton: View {
+//    let action: () -> Void
+//
+//    var body: some View {
+//        Button(action: action) {
+//            HStack(spacing: 6) {
+//                Image(systemName: "chevron.left")
+//                    .font(.system(size: 16, weight: .medium))
+//                Text("Kembali")
+//                    .font(.system(size: 17))
+//            }
+//            .foregroundColor(.blue)
+//        }
+//    }
+//}
 
 #Preview {
     AddItemView()

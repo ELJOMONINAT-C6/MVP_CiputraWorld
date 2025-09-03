@@ -12,4 +12,6 @@ struct CustomAttribute: Identifiable {
     let id = UUID()
     var name: String = ""
     var value: String = ""
+    
+    var isCompleted: Bool = false
 }

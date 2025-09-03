@@ -9,21 +9,20 @@
 import SwiftUI
 
 struct EquipmentPointView: View {
-    let equipment: Equipment
+    let equipment: sampleEquipment  // Menggunakan sampleEquipment
     let geometrySize: CGSize
     let isSelected: Bool
-//    let onTap: () -> Void
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel
     
     private var pointColor: Color {
         let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
         
         switch categoryToUse {
-        case "AC":
+        case "AHU":
             return Color("blue-cw")
-        case "HCU":
+        case "FAN":
             return Color("red-point")
-        case "CCTV":
+        case "AC":
             return Color("green-point")
         default:
             return .purple
@@ -55,24 +54,8 @@ struct EquipmentPointView: View {
                 }
             )
             .position(
-                x: equipment.xPosition,
-                y: equipment.yPosition
+                x: equipment.xPosition,  // Menggunakan xPosition dari sampleEquipment
+                y: equipment.yPosition   // Menggunakan yPosition dari sampleEquipment
             )
-//            .onTapGesture {
-//                onTap()
-//            }
-//            .overlay(
-//                // Equipment ID label
-//                Text(equipment.assetID)
-//                    .font(.caption2)
-//                    .fontWeight(isSelected ? .bold : .regular)
-//                    .foregroundColor(.black)
-//                    .background(Color.white.opacity(0.9))
-//                    .cornerRadius(4)
-//                    .position(
-//                        x: equipment.xPosition,
-//                        y: equipment.yPosition - 25
-//                    )
-//            )
     }
 }

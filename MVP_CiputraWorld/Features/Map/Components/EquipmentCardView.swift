@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EquipmentCardView: View {
-    let equipment: Equipment
+    let equipment: sampleEquipment  // Menggunakan sampleEquipment
     let onTap: () -> Void
     
     private var equipmentImage: String {
@@ -51,33 +51,27 @@ struct EquipmentCardView: View {
             
             // Equipment Info
             VStack(alignment: .leading, spacing: 4) {
-                Text(equipment.namaAlat)
+                Text(equipment.assetName)  // Menggunakan assetName
                     .font(.body)
                     .fontWeight(.medium)
                     .lineLimit(1)
                 
+               
                 Text("ID: \(equipment.assetID)")
                     .font(.subheadline)
-                    .foregroundColor(.primary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
                 
-                Text("Lokasi: \(equipment.lokasiPemasangan)")
+              
+                Text("Lokasi: \(equipment.assetLocation)")
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color(.systemGray5))
+                    .cornerRadius(8)
                     .lineLimit(1)
-                
-                Spacer()
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Last Maintenance: \(formatDate(equipment.tanggalInstalasi))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .italic()
-                    
-                    Text("Next Maintenance: \(formatDate(equipment.masaGaransi))")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                        .italic()
-                }
             }
             
             Spacer()
@@ -104,3 +98,4 @@ struct EquipmentCardView: View {
         return dateString
     }
 }
+
