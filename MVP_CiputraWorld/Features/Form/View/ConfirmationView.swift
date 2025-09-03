@@ -113,6 +113,8 @@ struct ConfirmationView: View {
             isSaving = false
             return
         }
+        
+//        ImageProcessor.saveMergedImage(image: image)
 
         let record = HistoryItem(
             machine: machine,
@@ -121,7 +123,9 @@ struct ConfirmationView: View {
             notes: notes,
             photoData: imageData,
             status: status,
-            technician: technician
+            technician: technician,
+            spvStatus: "Pending",
+            hodStatus: "Pending"
         )
 
         context.insert(record)

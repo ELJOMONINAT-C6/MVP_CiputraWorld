@@ -12,6 +12,8 @@ import Foundation
 
 @Model
 class HistoryItem {
+    @Attribute(.unique) var id: UUID
+    
     var machine: String
     var date: Date
     var details: String
@@ -21,16 +23,22 @@ class HistoryItem {
     // New fields
     var status: String
     var technician: String
+    var spvStatus: String
+    var hodStatus: String
     
     init(
+        id: UUID = UUID(),
         machine: String,
         date: Date,
         details: String,
         notes: String? = nil,
         photoData: Data? = nil,
         status: String,
-        technician: String
+        technician: String,
+        spvStatus: String,
+        hodStatus: String
     ) {
+        self.id = id
         self.machine = machine
         self.date = date
         self.details = details
@@ -38,5 +46,7 @@ class HistoryItem {
         self.photoData = photoData
         self.status = status
         self.technician = technician
+        self.spvStatus = spvStatus
+        self.hodStatus = hodStatus
     }
 }
