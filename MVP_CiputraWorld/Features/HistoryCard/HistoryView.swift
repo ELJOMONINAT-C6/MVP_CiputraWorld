@@ -48,6 +48,7 @@ struct HistoryView: View {
                                     .tag(category)
                             }
                         }
+                        .accessibilityHint("Pilih kategori peralatan")
                         .onChange(of: selectedCategory) { newValue in
                             suggestedEquipment = newValue.suggestedEquipment.rawValue
                         }
@@ -57,6 +58,7 @@ struct HistoryView: View {
                             TextField("Masukkan Kode Alat", text: $suggestedEquipment)
                                 .multilineTextAlignment(.trailing)
                                 .foregroundStyle(.secondary)
+                                .accessibilityHint("Masukkan kode peralatan secara manual")
                         }
                     } header: {
                         Text("JENIS PERALATAN")
@@ -70,11 +72,15 @@ struct HistoryView: View {
                             selection: $startDate,
                             displayedComponents: [.date]
                         )
+                        .accessibilityLabel("Tanggal mulai")
+                        .accessibilityHint("Pilih tanggal awal periode pencarian")
                         DatePicker(
                             "Sampai tanggal",
                             selection: $endDate,
                             displayedComponents: [.date]
                         )
+                        .accessibilityLabel("Tanggal selesai")
+                        .accessibilityHint("Pilih tanggal akhir periode pencarian")
                     } header: {
                         Text("PERIODE")
                             .font(.caption)
@@ -90,6 +96,7 @@ struct HistoryView: View {
                     .foregroundColor(.textClr)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
+                    .accessibilityHint("Tekan untuk mencari history card sesuai filter")
                 }
                 .navigationDestination(isPresented: $searchHistory) {
                     HistoryListView(
@@ -100,6 +107,7 @@ struct HistoryView: View {
                     )
                 }
             }
+//            .environment(\.locale, Locale(identifier: "id"))
             .navigationTitle("Cari History Card")
         }
     }
