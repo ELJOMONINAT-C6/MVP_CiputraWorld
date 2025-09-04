@@ -15,8 +15,8 @@ struct ContentView: View {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(named: "darkblue")
-        appearance.stackedLayoutAppearance.selected.iconColor = .white
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.stackedLayoutAppearance.selected.iconColor = .textClr
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.textClr]
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
