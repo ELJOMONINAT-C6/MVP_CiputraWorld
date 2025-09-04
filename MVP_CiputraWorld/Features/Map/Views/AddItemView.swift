@@ -200,7 +200,9 @@ struct AddItemView: View {
                     Spacer(minLength: 100)
                     
                     //Edit lokasi
-                    if selectedLocation != nil { Button(action: { showLocationPicker = true }) { Text("Edit Lokasi") .font(.system(size: 16, weight: .medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
+                    if selectedLocation != nil {
+                        NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
+                            Text("Edit Lokasi") .font(.system(size: 16, weight: .medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
                     
                     //Tambah Lokasi & Simpan
                     if selectedLocation == nil {
