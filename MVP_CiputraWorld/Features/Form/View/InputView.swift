@@ -113,10 +113,10 @@ struct InputView: View {
                             Text("Ambil Gambar")
                                 .fontWeight(.semibold)
                         }
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.foregroundClr)
                         .padding()
                         .frame(maxWidth: .infinity)
-                        .background(Color(.systemIndigo))
+                        .background(Color.backgroundClr)
                         .cornerRadius(10)
                         .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
                     }
@@ -208,7 +208,7 @@ struct FloatingDropdown: View {
                 .background(
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(Color.gray.opacity(0.4))
-                        .background(Color.white)
+                        .background(Color(.secondarySystemBackground))
                 )
             }
             .zIndex(1)
@@ -231,7 +231,7 @@ struct FloatingDropdown: View {
                             }
                             .padding()
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white)
+                            .background(Color(.secondarySystemBackground))
                         }
                         Divider()
                     }

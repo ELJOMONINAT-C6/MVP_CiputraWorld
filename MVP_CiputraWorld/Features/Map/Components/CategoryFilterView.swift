@@ -61,13 +61,13 @@ struct CategoryLabel: View {
             
             Text(text)
                 .font(.caption)
-                .foregroundColor(.primary)
+                .foregroundColor(isSelected ? Color.black : .primary)
             
             Spacer()
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(isSelected ? color.opacity(0.1) : Color.white)
+        .background(isSelected ? color.opacity(0.1) : Color(UIColor.systemBackground))
         .frame(maxWidth: 100)
         .cornerRadius(15)
         .overlay(

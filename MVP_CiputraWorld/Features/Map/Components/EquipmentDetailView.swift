@@ -74,10 +74,10 @@ struct EquipmentDetailView: View {
                         Text("Cek History Card")
                             .font(.body)
                             .fontWeight(.medium)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.foregroundClr)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color("darkblue"))
+                            .background(Color.backgroundClr)
                             .cornerRadius(10)
                     }
                     .padding(.top, 20)

@@ -92,8 +92,8 @@ struct HistoryView: View {
                     }
                     .disabled(suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty)
                     .buttonStyle(.borderedProminent)
-                    .tint(.interactiveClr)
-                    .foregroundColor(.textClr)
+                    .tint(.backgroundClr)
+                    .foregroundColor(.foregroundClr)
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
                     .accessibilityHint("Tekan untuk mencari history card sesuai filter")

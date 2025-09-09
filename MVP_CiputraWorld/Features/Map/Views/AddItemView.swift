@@ -188,7 +188,7 @@ struct AddItemView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color.white)
+                    .background(Color(UIColor.systemBackground))
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 6)
@@ -209,10 +209,10 @@ struct AddItemView: View {
                         NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
                             Text("Tambahkan Lokasi")
                                 .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.foregroundClr)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
-                                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
+                                .background(isFormValid ? Color.backgroundClr : Color.gray)
                                 .cornerRadius(8)
                         }
                         .disabled(!isFormValid)
