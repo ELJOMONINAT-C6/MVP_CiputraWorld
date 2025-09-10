@@ -36,7 +36,7 @@ struct AddItemView: View {
         !lokasiBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    /// 🔥 Fungsi Save Item
+    // 🔥 Fungsi Save Item
     private func handleSave() {
         guard isFormValid else {
             showValidationError = true
@@ -101,7 +101,7 @@ struct AddItemView: View {
                                 }
                                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
                                     Text("Ganti Foto")
-                                        .font(.system(size: 14))
+//                                        .font(.system(size: 14))
                                         .foregroundColor(.blue)
                                 }
                             } else {
@@ -113,10 +113,10 @@ struct AddItemView: View {
                                         .overlay(
                                             VStack {
                                                 Image(systemName: "photo.on.rectangle.angled")
-                                                    .font(.system(size: 40))
+//                                                    .font(.system(size: 40))
                                                     .foregroundColor(.gray)
                                                 Text("Pilih Foto")
-                                                    .font(.system(size: 16))
+//                                                    .font(.system(size: 16))
                                                     .foregroundColor(.gray)
                                             }
                                         )
@@ -202,16 +202,18 @@ struct AddItemView: View {
                     //Edit lokasi
                     if selectedLocation != nil {
                         NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
-                            Text("Edit Lokasi") .font(.system(size: 16, weight: .medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
+                            Text("Edit Lokasi") .font(.body.weight(.medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
                     
                     //Tambah Lokasi & Simpan
                     if selectedLocation == nil {
                         NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
                             Text("Tambahkan Lokasi")
-                                .font(.system(size: 16, weight: .medium))
+//                                .font(.system(size: 16, weight: .medium))
+                                .padding()
+                                .font(.body.weight(.medium))
                                 .foregroundColor(Color.foregroundClr)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
+                                .frame(maxWidth: .infinity, minHeight: 50)
+//                                .frame(height: 50)
                                 .background(isFormValid ? Color.backgroundClr : Color.gray)
                                 .cornerRadius(8)
                         }
@@ -221,7 +223,8 @@ struct AddItemView: View {
                     } else {
                         Button(action: handleSave) {
                             Text("Simpan")
-                                .font(.system(size: 16, weight: .medium))
+//                                .font(.system(size: 16, weight: .medium))
+                                .font(.body.weight(.medium))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
@@ -256,7 +259,7 @@ struct AddItemView: View {
 struct ErrorMessage: View {
     var body: some View {
         Text("Mohon lengkapi semua field yang wajib diisi (*)")
-            .font(.system(size: 14))
+//            .font(.system(size: 14))
             .foregroundColor(.red)
             .padding(.horizontal, 20)
             .padding(.bottom, 10)

@@ -19,16 +19,25 @@ struct RequiredFormField: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(title)
-                    .font(.system(size: 16, weight: .regular))
+                    .font(.body.weight(.regular))
                     .foregroundColor(.primary)
                 Text("*")
                     .foregroundColor(.red)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.body.weight(.medium))
                 Spacer()
             }
             
-            TextField(placeholder, text: $text)
-                .textFieldStyle(RequiredTextFieldStyle(isEmpty: isEmpty && showValidationError))
+            TextField(
+                "",
+                text: $text,
+                prompt: Text(placeholder)
+                    .font(.body)
+                    .foregroundColor(.gray)
+            )
+            .font(.body)
+            .textFieldStyle(
+                RequiredTextFieldStyle(isEmpty: isEmpty && showValidationError)
+            )
         }
     }
 }
@@ -43,24 +52,45 @@ struct CustomAttributeRow: View {
             HStack {
                 if attribute.isCompleted {
                     Text(attribute.key.isEmpty ? "-" : attribute.key)
-                        .font(.system(size: 16, weight: .regular))
+                        .font(.body.weight(.regular))
                         .foregroundColor(.primary)
                 } else {
-                    TextField("Nama Atribut (contoh: Brand, Model, dll)", text: $attribute.key)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundColor(.primary)
-                        .textFieldStyle(AttributeNameTextFieldStyle())
+//                    TextField("Nama Atribut (contoh: Brand, Model, dll)", text: $attribute.key)
+//                        .font(.body)
+//                        .foregroundColor(.primary)
+//                        .textFieldStyle(AttributeNameTextFieldStyle())
+                    
+                    TextField(
+                        "",
+                        text: $attribute.key,
+                        prompt: Text("Nama Atribut (contoh: Brand, Model, dll)")
+                            .font(.body)
+                            .foregroundColor(.gray)
+//                        axis: .vertical
+                    )
+                    .textFieldStyle(AttributeNameTextFieldStyle())
+                    .font(.body)
+
                 }
                 
                 Button(action: onRemove) {
                     Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 16))
+                        .font(.system(size: 40))
                         .foregroundColor(.red)
                 }
             }
             
-            TextField("Value", text: $attribute.value)
-                .textFieldStyle(CustomTextFieldStyle())
+            TextField(
+                "",
+                text: $attribute.value,
+                prompt: Text("Value")
+                    .font(.body)
+                    .foregroundColor(.gray)
+            )
+            .textFieldStyle(CustomTextFieldStyle())
+            .font(.body)
+
+
         }
         .padding(.vertical, 4)
     }
@@ -75,7 +105,7 @@ struct SpecificationSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Spesifikasi")
-                .font(.system(size: 16, weight: .bold))
+                .font(.body.weight(.bold))
                 .foregroundColor(.primary)
                 .frame(maxWidth: .infinity, alignment: .leading)
             
@@ -88,7 +118,6 @@ struct SpecificationSection: View {
             
             if customAttributes.isEmpty {
                 Text("Tap tombol + untuk menambahkan atribut spesifikasi")
-                    .font(.system(size: 14))
                     .foregroundColor(.gray)
                     .italic()
                     .frame(maxWidth: .infinity, alignment: .center)

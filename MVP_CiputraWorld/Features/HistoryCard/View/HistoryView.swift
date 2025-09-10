@@ -31,6 +31,14 @@ extension Category {
 }
 
 struct HistoryView: View {
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize: DynamicTypeSize
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
+    
     @State private var selectedCategory: Category = .ac
     @State private var suggestedEquipment: String = Category.ac.suggestedEquipment.rawValue
     @State private var startDate = Date()
@@ -48,11 +56,12 @@ struct HistoryView: View {
                                     .tag(category)
                             }
                         }
+                        .pickerStyle(.navigationLink)
                         .accessibilityHint("Pilih kategori peralatan")
                         .onChange(of: selectedCategory) { newValue in
                             suggestedEquipment = newValue.suggestedEquipment.rawValue
                         }
-                        HStack {
+                        dynamicLayout {
                             Text("Kode Alat")
                             Spacer()
                             TextField("Masukkan Kode Alat", text: $suggestedEquipment)
@@ -67,20 +76,37 @@ struct HistoryView: View {
                     }
                     
                     Section {
-                        DatePicker(
-                            "Dari tanggal",
-                            selection: $startDate,
-                            displayedComponents: [.date]
-                        )
-                        .accessibilityLabel("Tanggal mulai")
-                        .accessibilityHint("Pilih tanggal awal periode pencarian")
-                        DatePicker(
-                            "Sampai tanggal",
-                            selection: $endDate,
-                            displayedComponents: [.date]
-                        )
-                        .accessibilityLabel("Tanggal selesai")
-                        .accessibilityHint("Pilih tanggal akhir periode pencarian")
+                        dynamicLayout {
+                            Text("Dari tanggal")
+                            Spacer()
+                            DatePicker(
+                                "",
+                                selection: $startDate,
+                                displayedComponents: [.date]
+                            )
+                            .labelsHidden()
+                            .accessibilityLabel("Tanggal mulai")
+                            .accessibilityHint("Pilih tanggal awal periode pencarian")
+                        }
+                        dynamicLayout {
+                            Text("Sampai tanggal")
+                            Spacer()
+                            DatePicker(
+                                "",
+                                selection: $endDate,
+                                displayedComponents: [.date]
+                            )
+                            .labelsHidden()
+                            .accessibilityLabel("Tanggal selesai")
+                            .accessibilityHint("Pilih tanggal akhir periode pencarian")
+                        }
+//                        DatePicker(
+//                            "Sampai tanggal",
+//                            selection: $endDate,
+//                            displayedComponents: [.date]
+//                        )
+//                        .accessibilityLabel("Tanggal selesai")
+//                        .accessibilityHint("Pilih tanggal akhir periode pencarian")
                     } header: {
                         Text("PERIODE")
                             .font(.caption)
@@ -88,7 +114,8 @@ struct HistoryView: View {
                     }
                     Button(action: {handleSubmit(); searchHistory = true}) {
                         Text("Lihat Informasi")
-                            .frame(maxWidth: .infinity)
+                            .bold()
+                            .frame(maxWidth: .infinity, minHeight: 35)
                     }
                     .disabled(suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty)
                     .buttonStyle(.borderedProminent)

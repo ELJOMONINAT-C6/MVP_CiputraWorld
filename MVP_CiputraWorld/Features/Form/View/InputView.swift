@@ -125,17 +125,17 @@ struct InputView: View {
                     Spacer()
                 }
                 .navigationTitle("Input Form")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        HStack {
-                            Text("Input Form")
-                                .font(.system(size: 24, weight: .bold))
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                            Spacer()
-                        }
-                    }
-                }
+//                .navigationBarTitleDisplayMode(.inline)
+//                .toolbar {
+//                    ToolbarItem(placement: .principal) {
+//                        HStack {
+//                            Text("Input Form")
+//                                .font(.system(size: 24, weight: .bold))
+//                                .frame(maxWidth: .infinity, alignment: .leading)
+//                            Spacer()
+//                        }
+//                    }
+//                }
                 .background(
                     NavigationLink(
                         destination: CameraView(
@@ -197,9 +197,12 @@ struct FloatingDropdown: View {
     var body: some View {
         ZStack {
             Button(action: { withAnimation { isOpen.toggle() } }) {
-                HStack {
+                HStack() {
                     Text(selected.isEmpty ? title : selected)
                         .foregroundColor(selected == "Rusak" ? .red : .primary)
+                        .lineLimit(nil)
+                        .frame(alignment: .leading)
+                        .fixedSize(horizontal: false, vertical: true)
                     Spacer()
                     Image(systemName: isOpen ? "chevron.up" : "chevron.down")
                         .foregroundColor(.gray)
@@ -224,6 +227,9 @@ struct FloatingDropdown: View {
                             HStack {
                                 Text(option)
                                     .foregroundColor(option == "Rusak" ? .red : .primary)
+                                    .lineLimit(nil)
+                                    .frame(alignment: .leading)
+                                    .fixedSize(horizontal: false, vertical: true)
                                 Spacer()
                                 if selected == option {
                                     Image(systemName: "checkmark")

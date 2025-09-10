@@ -9,8 +9,16 @@ import Foundation
 import SwiftUI
 
 struct HistoryListView: View {
-    @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = HistoryViewModel()
+    
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize: DynamicTypeSize
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
     
     let category: Category
     let kodeAlat: String
@@ -22,7 +30,7 @@ struct HistoryListView: View {
             NavigationLink {
                 HistoryDetailView(history: history)
             } label: {
-                HStack {
+                dynamicLayout {
                     Text(history.title)
                         .font(.body)
                     Spacer()

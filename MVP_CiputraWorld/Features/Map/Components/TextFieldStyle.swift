@@ -18,7 +18,7 @@ struct AttributeNameTextFieldStyle: TextFieldStyle {
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(Color(.systemGray4), lineWidth: 1)
             )
-            .font(.system(size: 14, weight: .medium))
+            .environment(\.font, .body)
     }
 }
 
@@ -35,7 +35,7 @@ struct RequiredTextFieldStyle: TextFieldStyle {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(isEmpty ? Color.red : Color(.systemGray4), lineWidth: isEmpty ? 2 : 1)
             )
-            .font(.system(size: 16))
+            .environment(\.font, .body)
     }
 }
 
@@ -50,6 +50,6 @@ struct CustomTextFieldStyle: TextFieldStyle {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color(.systemGray4), lineWidth: 1)
             )
-            .font(.system(size: 16))
+            .environment(\.font, .body)
     }
 }

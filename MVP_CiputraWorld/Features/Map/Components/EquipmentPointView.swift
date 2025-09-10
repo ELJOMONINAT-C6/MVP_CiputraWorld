@@ -57,5 +57,6 @@ struct EquipmentPointView: View {
                 x: equipment.xPosition,  // Menggunakan xPosition dari sampleEquipment
                 y: equipment.yPosition   // Menggunakan yPosition dari sampleEquipment
             )
+            //.accessibilityHint("Tap here to see \(equipment.assetName) with ID \(equipment.assetID) details")
     }
 }

@@ -10,6 +10,13 @@ import SwiftUI
 
 struct HistoryDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize: DynamicTypeSize
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
     
     let history: HistoryItem2
     
@@ -36,14 +43,14 @@ struct HistoryDetailView: View {
                 Text("Status Unit: Maintenance Selesai")
                     .font(.subheadline)
                 Spacer()
-                HStack {
+                dynamicLayout {
                     Text("Status Supervisor:")
                     Text("Approved")
                         .foregroundColor(.green)
                         .fontWeight(.semibold)
                 }
                 .font(.subheadline)
-                HStack {
+                dynamicLayout {
                     Text("Head of Department Status:")
                     Text("Pending")
                         .foregroundColor(.red)
