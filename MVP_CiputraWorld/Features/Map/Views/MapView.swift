@@ -8,42 +8,30 @@
 import SwiftUI
 
 struct MapView: View {
-    @StateObject private var equipmentStore = EquipmentStore()
-    @StateObject private var equipmentDataViewModel = EquipmentDataViewModel()
     @StateObject private var mapViewModel: EquipmentFilteringViewModel
     
     @State private var mapScale: CGFloat = 1.0
     @State private var lastScale: CGFloat = 1.0
     @State private var mapOffset: CGSize = .zero
-    
     @State private var showingSearchResults = false
-    
     
     let floorName: String
     
-    init(floorName: String = "Default Floor") {
+    init(floorName: String, mapViewModel: EquipmentFilteringViewModel) {
         self.floorName = floorName
-        let equipmentVM = EquipmentDataViewModel()
-        _equipmentDataViewModel = StateObject(wrappedValue: equipmentVM)
-        _mapViewModel = StateObject(wrappedValue: EquipmentFilteringViewModel(equipmentViewModel: equipmentVM))
+        _mapViewModel = StateObject(wrappedValue: mapViewModel)
     }
     
-    // Computed property untuk hasil search
-    private var searchResults: [sampleEquipment] {
+    private var searchResults: [Equipment] {
         if mapViewModel.searchText.isEmpty {
             return []
         }
-        return equipmentDataViewModel.equipments.filter { equipment in
-            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-            equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-            equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
-        }
+        return mapViewModel.filteredEquipment
     }
-
+    
     var body: some View {
         ZStack {
             ZStack(alignment: .top) {
-                // Map View
                 GeometryReader { geometry in
                     ZStack {
                         Image("map")
@@ -52,7 +40,6 @@ struct MapView: View {
                             .scaleEffect(mapScale)
                             .offset(mapOffset)
                         
-                        // Equipment points overlay
                         ForEach(mapViewModel.filteredEquipment) { equipment in
                             NavigationLink(
                                 destination: EquipmentDetailView(equipment: equipment)
@@ -70,7 +57,6 @@ struct MapView: View {
                         }
                     }
                     
-                    // Zoom using 2 fingers
                     .gesture(
                         MagnificationGesture()
                             .onChanged { value in
@@ -81,7 +67,6 @@ struct MapView: View {
                             }
                     )
                     
-                    // Drag the map
                     .gesture(
                         DragGesture()
                             .onChanged { value in
@@ -94,7 +79,6 @@ struct MapView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.leading)
                     .padding(.top, 8)
-                
             }
             
             if showingSearchResults {
@@ -104,7 +88,7 @@ struct MapView: View {
                         showingSearchResults = false
                         mapViewModel.searchText = ""
                     }
-
+                
                 VStack {
                     EquipmentListView(
                         equipment: searchResults,
@@ -125,24 +109,12 @@ struct MapView: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .bottom)
             }
-
         }
         .navigationTitle(floorName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                Button(action: {
-//                    dismiss()
-//                }) {
-//                    HStack {
-//                       Image(systemName: "chevron.left")
-//                       Text("Kembali")
-//                   }
-//                }
-//            }
-            
             ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink(destination: AddItemView()) {
+                NavigationLink(destination: AddItemView().environmentObject(mapViewModel)) {
                     Image(systemName: "plus.square.fill.on.square.fill")
                         .font(.system(size: 20))
                         .symbolRenderingMode(.monochrome)
@@ -151,10 +123,6 @@ struct MapView: View {
             }
         }
         .searchable(text: $mapViewModel.searchText, prompt: "Cari")
-        .onAppear {
-            // Selalu sync data dari EquipmentStore ke EquipmentDataViewModel
-            syncDataFromStore()
-        }
         .onChange(of: mapViewModel.searchText) { _, newValue in
             showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
         }
@@ -165,21 +133,9 @@ struct MapView: View {
         mapOffset = .zero
         mapViewModel.clearSelection()
     }
-    
-    private func syncDataFromStore() {
-        // Clear existing data
-        equipmentDataViewModel.equipments.removeAll()
-        
-        // Add all data from store
-        equipmentStore.equipments.forEach { equipment in
-            equipmentDataViewModel.add(equipment)
-        }
-    }
 }
 
-struct MapView_Previews: PreviewProvider {
-    static var previews: some View {
-        MapView()
-    }
+#Preview {
+    MapView(floorName: "Basement", mapViewModel: EquipmentFilteringViewModel())
 }
 

@@ -27,7 +27,7 @@ struct ConfirmationView: View {
 
     @State private var isSaving: Bool = false
     @State private var saveError: String? = nil
-    @State private var showSavedAlert: Bool = false
+    @State private var showSuccessView: Bool = false   // 👈 NEW
 
     var body: some View {
         NavigationView {
@@ -46,7 +46,7 @@ struct ConfirmationView: View {
 
                 Spacer()
                 
-                // Foto Ulang Button (moved above Submit)
+                // Foto Ulang Button
                 Button(action: { dismiss() }) {
                     HStack {
                         Image(systemName: "camera.fill")
@@ -61,7 +61,7 @@ struct ConfirmationView: View {
                     .padding(.horizontal, 24)
                 }
                 
-                // Submit Button to store data to database
+                // Submit Button
                 Button(action: submitRecord) {
                     HStack {
                         if isSaving {
@@ -83,18 +83,26 @@ struct ConfirmationView: View {
                 Spacer()
             }
             .navigationTitle("Konfirmasi Foto")
-            .navigationBarTitleDisplayMode(.inline) // 👈 centered + smaller
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Batal") { dismiss() }
                 }
             }
-            // Alert on pressing the button
-            .alert("Berhasil", isPresented: $showSavedAlert) {
-                Button("OK", role: .cancel) { dismiss() }
-            } message: {
-                Text("Data berhasil disimpan.")
+            // ✅ Tampilkan SuccessView setelah submit
+            .fullScreenCover(isPresented: $showSuccessView) {
+                SuccessView(
+                    machine: machine,
+                    date: date,
+                    details: details,
+                    notes: notes,
+                    status: status,
+                    technician: technician,
+                    image: image
+                )
             }
+            // ❌ Hapus alert sukses
+            // ✅ Tetap simpan alert error
             .alert("Error", isPresented: Binding(get: { saveError != nil }, set: { _ in saveError = nil })) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -103,7 +111,7 @@ struct ConfirmationView: View {
         }
     }
 
-    // Submit Button Handler  (the logic to store to database)
+    // Submit Button Handler
     private func submitRecord() {
         isSaving = true
         saveError = nil
@@ -113,8 +121,6 @@ struct ConfirmationView: View {
             isSaving = false
             return
         }
-        
-//        ImageProcessor.saveMergedImage(image: image)
 
         let record = HistoryItem(
             machine: machine,
@@ -133,7 +139,7 @@ struct ConfirmationView: View {
             try context.save()
             onSave()
             isSaving = false
-            showSavedAlert = true
+            showSuccessView = true   // 👈 pindah ke SuccessView
         } catch {
             isSaving = false
             saveError = "Gagal menyimpan: \(error.localizedDescription)"

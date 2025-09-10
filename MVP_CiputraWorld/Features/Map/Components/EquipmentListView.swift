@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct EquipmentListView: View {
-    let equipment: [sampleEquipment]
+    let equipment: [Equipment]
     let searchText: String
-    let onSelect: (sampleEquipment) -> Void
+    let onSelect: (Equipment) -> Void
     let onDismiss: () -> Void
     
     var body: some View {

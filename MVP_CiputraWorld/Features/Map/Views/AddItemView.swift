@@ -10,7 +10,7 @@ import PhotosUI
 
 struct AddItemView: View {
     @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var viewModel: EquipmentDataViewModel  // 🔥 Tambahkan ini
+    @EnvironmentObject var mapViewModel: EquipmentFilteringViewModel
 
     // Form Fields
     @State private var namaItem = ""
@@ -36,39 +36,40 @@ struct AddItemView: View {
         !lokasiBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    /// 🔥 Fungsi Save Item
     private func handleSave() {
         guard isFormValid else {
             showValidationError = true
             return
         }
         
-        // Convert customAttributes ke Dictionary
         var attributesDict = Dictionary(
             uniqueKeysWithValues: customAttributes
                 .filter { !$0.key.isEmpty && !$0.value.isEmpty }
                 .map { ($0.key, $0.value) }
         )
         
-        // Masukkan lokasi (jika ada)
         if let loc = selectedLocation {
             attributesDict["xPosition"] = String(format: "%.4f", loc.x)
             attributesDict["yPosition"] = String(format: "%.4f", loc.y)
         }
         
-        // Buat item baru
-        let newItem = sampleEquipment(
-            assetID: idBarang,
-            assetName: namaItem,
-            assetLocation: lokasiBarang,
-            assetSpecification: attributesDict
-        )
-        
-        // Simpan ke ViewModel
-        viewModel.add(newItem)
-        
-        // Tampilkan alert sukses
-        showSuccessAlert = true
+        // Create a new item to insert
+        Task {
+            do {
+                // Insert item into Supabase
+                try await SupabaseManager.shared.insertEquipment(
+                    assetID: idBarang,
+                    assetName: namaItem,
+                    assetLocation: lokasiBarang,
+                    assetSpec: attributesDict,
+                    imagePath: selectedImage?.jpegData(compressionQuality: 0.8)?.base64EncodedString()
+                )
+                
+                showSuccessAlert = true
+            } catch {
+                print("Error inserting equipment: \(error)")
+            }
+        }
     }
     
     var body: some View {
@@ -142,7 +143,7 @@ struct AddItemView: View {
                         )
                         
                         RequiredFormField(
-                            title: "ID Barang",
+                            title: "ID Item",
                             text: $idBarang,
                             placeholder: "Value",
                             isEmpty: idBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
@@ -150,7 +151,7 @@ struct AddItemView: View {
                         )
                         
                         RequiredFormField(
-                            title: "Lokasi Barang",
+                            title: "Keterangan Lokasi",
                             text: $lokasiBarang,
                             placeholder: "Value",
                             isEmpty: lokasiBarang.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
@@ -163,7 +164,7 @@ struct AddItemView: View {
                         // PREVIEW LOKASI
                         if let location = selectedLocation {
                             VStack {
-                                Text("Lokasi Terpilih")
+                                Text("Titik Lokasi Terpilih")
                                     .font(.headline)
                                 GeometryReader { geo in
                                     if let uiImage = UIImage(named: "map") {
@@ -252,7 +253,6 @@ struct AddItemView: View {
     }
 }
 
-
 struct ErrorMessage: View {
     var body: some View {
         Text("Mohon lengkapi semua field yang wajib diisi (*)")
@@ -265,5 +265,5 @@ struct ErrorMessage: View {
 
 #Preview {
     AddItemView()
-        .environmentObject(EquipmentDataViewModel())
+        .environmentObject(EquipmentFilteringViewModel())
 }

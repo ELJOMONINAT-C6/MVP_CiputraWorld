@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EquipmentCardView: View {
-    let equipment: sampleEquipment
+    let equipment: Equipment
     
     private var equipmentImage: String {
         if let imagePath = equipment.imagePath,

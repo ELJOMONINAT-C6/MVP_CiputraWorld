@@ -8,8 +8,7 @@
 import Foundation
 import UIKit
 
-extension sampleEquipment: Identifiable {
-    var id: String { assetID }
+extension Equipment {
     
     // Position (get from specification)
     var xPosition: Double {
@@ -24,25 +23,6 @@ extension sampleEquipment: Identifiable {
     var equipmentType: String {
         let components = assetName.split(separator: " ")
         return components.first.map { String($0) } ?? "Unknown"
-    }
-    
-    var floor: Int {
-        if assetLocation.lowercased().contains("lantai 1") {
-            return 1
-        } else if assetLocation.lowercased().contains("lantai 2") {
-            return 2
-        } else if assetLocation.lowercased().contains("lantai 3") {
-            return 3
-        }
-        return 1 // default lantai 1
-    }
-    
-    var isActive: Bool {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        
-        guard let warrantyDate = formatter.date(from: assetSpecification["masaGaransi"] ?? "") else { return true }
-        return warrantyDate > Date()
     }
 }
 

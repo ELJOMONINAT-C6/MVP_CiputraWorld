@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct MVP_CiputraWorldApp: App {
-    @StateObject private var viewModel = EquipmentDataViewModel()
+    @StateObject private var viewModel = EquipmentFilteringViewModel()
     
     var body: some Scene {
         WindowGroup {

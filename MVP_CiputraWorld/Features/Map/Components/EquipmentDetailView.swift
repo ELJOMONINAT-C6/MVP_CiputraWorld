@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct EquipmentDetailView: View {
-    @ObservedObject var equipment: sampleEquipment
+    @ObservedObject var equipment: Equipment
     @Environment(\.presentationMode) var presentationMode
     
     var body: some View {

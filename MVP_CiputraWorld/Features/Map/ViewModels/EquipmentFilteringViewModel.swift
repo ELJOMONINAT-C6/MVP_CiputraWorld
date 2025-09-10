@@ -10,7 +10,8 @@ import Combine
 
 @MainActor
 class EquipmentFilteringViewModel: ObservableObject {
-    @Published var filteredEquipment: [sampleEquipment] = []
+    @Published var equipments: [Equipment] = []
+    @Published var filteredEquipment: [Equipment] = []
     @Published var searchText: String = "" {
         didSet {
             filterEquipment()
@@ -23,36 +24,29 @@ class EquipmentFilteringViewModel: ObservableObject {
         }
     }
     
-    @Published var selectedEquipment: sampleEquipment?
+    @Published var selectedEquipment: Equipment?  // Ganti sampleEquipment ke Equipment
     
-    private var equipmentViewModel: EquipmentDataViewModel
     private var cancellables = Set<AnyCancellable>()
     
-    init(equipmentViewModel: EquipmentDataViewModel) {
-        self.equipmentViewModel = equipmentViewModel
-        setupBindings()
-        filterEquipment()
+    init() {
+        Task {
+            await loadEquipments()  // Ambil data dari Supabase
+        }
     }
     
-    private func setupBindings() {
-        // Observe perubahan data di EquipmentViewModel
-        equipmentViewModel.$equipments
-            .sink { [weak self] _ in
-                self?.filterEquipment()
-            }
-            .store(in: &cancellables)
-        
-        // Debounce search biar nggak berat
-        $searchText
-            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.filterEquipment()
-            }
-            .store(in: &cancellables)
+    // Ambil data dari Supabase
+    private func loadEquipments() async {
+        do {
+            self.equipments = try await SupabaseManager.shared.fetchEquipment()
+            filterEquipment()  // Filter data yang sudah di-fetch
+        } catch {
+            print("Error fetching equipments: \(error)")
+        }
     }
     
+    // Filter berdasarkan pencarian dan kategori
     private func filterEquipment() {
-        let allEquipment = equipmentViewModel.equipments
+        let allEquipment = equipments
         
         // Filter berdasarkan category dan search text
         filteredEquipment = allEquipment.filter { equipment in
@@ -67,14 +61,37 @@ class EquipmentFilteringViewModel: ObservableObject {
             // Filter by search text jika tidak kosong
             if !searchText.isEmpty {
                 matchesSearch = equipment.assetID.localizedCaseInsensitiveContains(searchText) ||
-                                equipment.assetName.localizedCaseInsensitiveContains(searchText)
+                equipment.assetName.localizedCaseInsensitiveContains(searchText)
             }
             
             return matchesCategory && matchesSearch
         }
     }
     
-    func selectEquipment(_ equipment: sampleEquipment) {
+//    init(equipments: Equipment) {
+//        self.equipments = Equipment
+//        setupBindings()
+//        filterEquipment()
+//    }
+
+    private func setupBindings() {
+        // Observe perubahan data di EquipmentStore
+//        equipmentStore.$equipments
+//            .sink { [weak self] _ in
+//                self?.filterEquipment()
+//            }
+//            .store(in: &cancellables)
+        
+        // Debounce search biar nggak berat
+        $searchText
+            .debounce(for: .milliseconds(300), scheduler: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.filterEquipment()
+            }
+            .store(in: &cancellables)
+    }
+    
+    func selectEquipment(_ equipment: Equipment) {  // Ganti sampleEquipment ke Equipment
         selectedEquipment = equipment
         searchText = equipment.assetID
     }
@@ -96,4 +113,7 @@ class EquipmentFilteringViewModel: ObservableObject {
         searchText = ""
     }
 }
+    
+
+
 

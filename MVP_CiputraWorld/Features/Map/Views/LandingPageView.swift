@@ -8,37 +8,17 @@
 import SwiftUI
 
 struct LandingPageView: View {
-    @State private var showingMap = false
-    @State private var selectedFloor = ""
-    @StateObject private var equipmentStore = EquipmentStore()
-    @StateObject private var equipmentDataViewModel = EquipmentDataViewModel()
-    @StateObject private var mapViewModel: EquipmentFilteringViewModel
+    @StateObject private var mapViewModel = EquipmentFilteringViewModel()
     
     @State private var showingSearchResults = false
-    
-    init(floorName: String = "Default Floor") {
-        let equipmentVM = EquipmentDataViewModel()
-        _mapViewModel = StateObject(wrappedValue: EquipmentFilteringViewModel(equipmentViewModel: equipmentVM))
-    }
-    
-    private var searchResults: [sampleEquipment] {
-        if mapViewModel.searchText.isEmpty {
-            return []
-        }
-        return equipmentDataViewModel.equipments.filter { equipment in
-            equipment.assetName.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-            equipment.assetID.localizedCaseInsensitiveContains(mapViewModel.searchText) ||
-            equipment.equipmentType.localizedCaseInsensitiveContains(mapViewModel.searchText)
-        }
-    }
     
     var body: some View {
         NavigationStack {
             Group {
                 if showingSearchResults {
                     ScrollView {
-                        LazyVStack(spacing: 0) { // spacing 0 biar divider nempel
-                            ForEach(searchResults, id: \.id) { equipment in
+                        LazyVStack(spacing: 0) {
+                            ForEach(mapViewModel.filteredEquipment, id: \.id) { equipment in
                                 NavigationLink(destination: EquipmentDetailView(equipment: equipment)) {
                                     EquipmentCardView(equipment: equipment)
                                         .padding(.vertical, 8)
@@ -46,33 +26,32 @@ struct LandingPageView: View {
                                 }
                                 .buttonStyle(.plain)
                                 
-                                Divider() // garis pemisah antar item
-                                    .padding(.leading) // biar rata dengan konten
+                                Divider()
+                                    .padding(.leading)
                             }
                         }
                         .background(Color.white)
                     }
-
                 } else {
                     ScrollView {
                         VStack(spacing: 16) {
-                            NavigationLink(destination: MapView(floorName: "Basement")) {
+                            NavigationLink(destination: MapView(floorName: "Basement", mapViewModel: mapViewModel)) {
                                 FloorCard(title: "BASEMENT", imageName: "map")
                             }
                             
-                            NavigationLink(destination: MapView(floorName: "Lantai LG")) {
+                            NavigationLink(destination: MapView(floorName: "Lantai LG", mapViewModel: mapViewModel)) {
                                 FloorCard(title: "LANTAI LG", imageName: "map")
                             }
                             
-                            NavigationLink(destination: MapView(floorName: "Lantai G")) {
+                            NavigationLink(destination: MapView(floorName: "Lantai G", mapViewModel: mapViewModel)) {
                                 FloorCard(title: "LANTAI G", imageName: "map")
                             }
                             
-                            NavigationLink(destination: MapView(floorName: "Lantai 1")) {
+                            NavigationLink(destination: MapView(floorName: "Lantai 1", mapViewModel: mapViewModel)) {
                                 FloorCard(title: "LANTAI 1", imageName: "map")
                             }
                             
-                            NavigationLink(destination: MapView(floorName: "Lantai 2")) {
+                            NavigationLink(destination: MapView(floorName: "Lantai 2", mapViewModel: mapViewModel)) {
                                 FloorCard(title: "LANTAI 2", imageName: "map")
                             }
                         }
@@ -83,31 +62,12 @@ struct LandingPageView: View {
             }
             .navigationTitle("Denah")
             .searchable(text: $mapViewModel.searchText, prompt: "Cari barang apa?")
-            .sheet(isPresented: $showingMap) {
-                MapView(floorName: selectedFloor)
-            }
-            .onAppear {
-                // Selalu sync data dari EquipmentStore ke EquipmentDataViewModel
-                syncDataFromStore()
-            }
             .onChange(of: mapViewModel.searchText) { _, newValue in
-                showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
+                showingSearchResults = !newValue.isEmpty
             }
-        }
-    }
-    
-    private func syncDataFromStore() {
-        // Clear existing data
-        equipmentDataViewModel.equipments.removeAll()
-        
-        // Add all data from store
-        equipmentStore.equipments.forEach { equipment in
-            equipmentDataViewModel.add(equipment)
         }
     }
 }
-
-
 
 #Preview {
     LandingPageView()
