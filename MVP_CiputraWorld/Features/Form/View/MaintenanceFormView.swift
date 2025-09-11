@@ -28,19 +28,21 @@ struct InputView: View {
                                     title: "Select Machine",
                                     selected: Binding(
                                         get: {
-                                            if let id = viewModel.selectedEquipmentID,
-                                               let eq = viewModel.equipments.first(where: { $0.id == id }) {
-                                                return eq.assetName
+                                            if let id = viewModel.selectedEquipmentID {
+                                                // Menampilkan assetID, bukan UUID
+                                                if let equipment = viewModel.equipments.first(where: { $0.id == id }) {
+                                                    return equipment.assetID
+                                                }
                                             }
                                             return ""
                                         },
-                                        set: { name in
-                                            if let eq = viewModel.equipments.first(where: { $0.assetName == name }) {
-                                                viewModel.selectedEquipmentID = eq.id
+                                        set: { assetID in
+                                            if let equipment = viewModel.equipments.first(where: { $0.assetID == assetID }) {
+                                                viewModel.selectedEquipmentID = equipment.id
                                             }
                                         }
                                     ),
-                                    options: viewModel.equipments.map { $0.assetName }
+                                    options: viewModel.equipments.map { $0.assetID }
                                 )
                             }
                             .zIndex(2)
@@ -151,6 +153,7 @@ struct InputView: View {
                 }
             }
             .onAppear {
+                viewModel.resetForm()
                 Task {
                     await viewModel.fetchEquipments()
                 }

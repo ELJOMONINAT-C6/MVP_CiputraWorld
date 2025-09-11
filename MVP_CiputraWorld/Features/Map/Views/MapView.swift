@@ -50,6 +50,7 @@ struct MapView: View {
                                     isSelected: mapViewModel.selectedEquipment?.assetID == equipment.assetID,
                                     mapViewModel: mapViewModel
                                 )
+                                .accessibilityHint("Tap here to see the details of \(equipment.assetName) with ID \(equipment.assetID)")
                             }
                             .buttonStyle(PlainButtonStyle())
                             .scaleEffect(mapScale)

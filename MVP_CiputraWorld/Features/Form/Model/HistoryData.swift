@@ -8,9 +8,8 @@
 //import SwiftData
 import Foundation
 
-/// Model untuk data riwayat maintenance, sesuai tabel `history_items` di Supabase
 struct HistoryItem: Identifiable, Codable {
-    let id: UUID
+    let id: UUID?
     let equipmentID: UUID
     let maintenanceDate: Date
     let details: String
@@ -35,47 +34,18 @@ struct HistoryItem: Identifiable, Codable {
         case hodStatus = "hod_status"
         case createdAt = "created_at"
     }
+    
+    init(equipmentID: UUID, maintenanceDate: Date, details: String, notes: String?, status: String, technician: String) {
+        self.id = nil
+        self.equipmentID = equipmentID
+        self.maintenanceDate = maintenanceDate
+        self.details = details
+        self.notes = notes
+        self.photoURL = nil
+        self.status = status
+        self.technician = technician
+        self.spvStatus = "pending"
+        self.hodStatus = "pending"
+        self.createdAt = Date()
+    }
 }
-
-// Model for database
-
-//@Model
-//class HistoryItem {
-//    @Attribute(.unique) var id: UUID
-//
-//    var machine: String
-//    var date: Date
-//    var details: String
-//    var notes: String?
-//    var photoData: Data?   // store image as Data
-//
-//    // New fields
-//    var status: String
-//    var technician: String
-//    var spvStatus: String
-//    var hodStatus: String
-//
-//    init(
-//        id: UUID = UUID(),
-//        machine: String,
-//        date: Date,
-//        details: String,
-//        notes: String? = nil,
-//        photoData: Data? = nil,
-//        status: String,
-//        technician: String,
-//        spvStatus: String,
-//        hodStatus: String
-//    ) {
-//        self.id = id
-//        self.machine = machine
-//        self.date = date
-//        self.details = details
-//        self.notes = notes
-//        self.photoData = photoData
-//        self.status = status
-//        self.technician = technician
-//        self.spvStatus = spvStatus
-//        self.hodStatus = hodStatus
-//    }
-//}

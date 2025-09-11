@@ -22,6 +22,9 @@ struct CameraView: View {
     @State private var showingAlert = false
     @State private var alertTitle = ""
     @State private var alertMessage = ""
+    @State private var timestamp: Date? = nil
+    
+    @State private var navigateToSuccessView = false
     
     var body: some View {
         ZStack {
@@ -44,6 +47,7 @@ struct CameraView: View {
                     Button("Simpan Data") {
                         Task {
                             await uploadAndSave()
+                            navigateToSuccessView = true
                         }
                     }
                     .buttonStyle(.borderedProminent)
@@ -51,6 +55,7 @@ struct CameraView: View {
                     
                     Button("Ambil ulang") {
                         capturedImage = nil
+                        timestamp = nil
                         isShowingCamera = true
                     }
                     .buttonStyle(.plain)
@@ -76,11 +81,15 @@ struct CameraView: View {
             ImagePicker(
                 sourceType: .camera,
                 onImagePicked: { image in
-                    self.capturedImage = image
+                    let now = Date()
+                    self.timestamp = now
+                    // 🔹 Tambahkan watermark timestamp ke gambar
+                    self.capturedImage = addTimestamp(to: image, date: now)
                     self.isShowingCamera = false
                 },
                 onCancel: {
                     self.capturedImage = nil
+                    self.timestamp = nil
                     self.isShowingCamera = false
                 }
             )
@@ -92,7 +101,53 @@ struct CameraView: View {
                 }
             })
         }
+        
+        .navigationDestination(isPresented: $navigateToSuccessView) {
+            SuccessView(
+                machine: historyItem.equipmentID.uuidString,
+                date: historyItem.maintenanceDate,
+                details: historyItem.details,
+                notes: historyItem.notes,
+                status: historyItem.status,
+                technician: historyItem.technician,
+                image: capturedImage ?? UIImage()
+            )
+        }
     }
+    
+    private func addTimestamp(to image: UIImage, date: Date) -> UIImage {
+       let format = DateFormatter()
+       format.dateFormat = "dd/MM/yyyy HH:mm"
+       let dateText = format.string(from: date)
+        let text = "Diambil pada \(dateText)"
+       
+//       let scale = UIScreen.main.scale
+       let renderer = UIGraphicsImageRenderer(size: image.size)
+       return renderer.image { ctx in
+           image.draw(in: CGRect(origin: .zero, size: image.size))
+           
+           // Style teks
+           let paragraphStyle = NSMutableParagraphStyle()
+           paragraphStyle.alignment = .left
+           
+           let attrs: [NSAttributedString.Key: Any] = [
+               .font: UIFont.boldSystemFont(ofSize: image.size.width * 0.04),
+               .foregroundColor: UIColor.white,
+               .paragraphStyle: paragraphStyle,
+           ]
+           
+           let padding: CGFloat = 16
+           let attributedText = NSAttributedString(string: text, attributes: attrs)
+           let textSize = attributedText.size()
+           let rect = CGRect(
+               x: padding,
+               y: image.size.height - textSize.height - padding,
+               width: textSize.width,
+               height: textSize.height
+           )
+           attributedText.draw(in: rect)
+       }
+   }
     
     private func uploadAndSave() async {
         isUploading = true
@@ -103,22 +158,21 @@ struct CameraView: View {
                 throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Gagal mengonversi gambar."])
             }
             
-            let fileName = "\(historyItem.id).jpeg"
-            let photoPath = "maintenance_photos/\(fileName)"
+            let insertedItem = try await SupabaseManager.shared.insertHistoryItem(item: historyItem)
+               guard let validID = insertedItem.id else {
+                   throw NSError(domain: "SupabaseError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Gagal mendapatkan ID item yang disimpan."])
+               }
+            
+            let fileName = "\(validID).jpeg"
+            let photoPath = "maintenance-photos/\(fileName)"
             
             // Unggah gambar ke Supabase Storage
             try await SupabaseManager.shared.uploadImage(data: imageData, path: photoPath)
             
-            // Perbarui historyItem dengan photoURL
-            var updatedItem = historyItem
-            updatedItem.photoURL = photoPath
-            
             // Simpan data history ke Supabase Database
-            try await SupabaseManager.shared.insertHistoryItem(item: updatedItem)
+            try await SupabaseManager.shared.updateHistoryItemPhoto(id: validID, photoURL: photoPath)
             
-            alertTitle = "Berhasil"
-            alertMessage = "Data maintenance berhasil disimpan."
-            showingAlert = true
+            navigateToSuccessView = true
             
         } catch {
             print("Error: \(error)")

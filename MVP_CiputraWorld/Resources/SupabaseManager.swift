@@ -52,15 +52,54 @@ extension SupabaseManager {
     }
     
     func uploadImage(data: Data, path: String) async throws {
-            try await client.storage
-                .from("maintenance-photos")
-                .upload(path, data: data)
-        }
+        try await client.storage
+            .from("maintenance-photos")
+            .upload(path, data: data)
+    }
         
-    func insertHistoryItem(item: HistoryItem) async throws {
-        try await client
+    func insertHistoryItem(item: HistoryItem) async throws -> HistoryItem {
+        let insertedItem: [HistoryItem] = try await client
             .from("history_items")
             .insert(item)
+            .select()
             .execute()
+            .value
+
+        guard let newItem = insertedItem.first else {
+            throw NSError(domain: "SupabaseError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Gagal mendapatkan item yang baru dibuat."])
+        }
+        return newItem
+    }
+    
+    func updateHistoryItemPhoto(id: UUID, photoURL: String) async throws {
+        _ = try await client
+            .from("history_items")
+            .update(["photo_url": photoURL])
+            .eq("id", value: id)
+            .select()
+            .single()
+            .execute()
+    }
+    
+    func fetchHistoryItems(equipmentID: UUID, startDate: Date, endDate: Date) async throws -> [HistoryItem] {
+        let query = client.from("history_items")
+            .select()
+            .eq("equipment_id", value: equipmentID)
+            .gte("maintenance_date", value: startDate)
+            .lte("maintenance_date", value: endDate)
+
+        let response: PostgrestResponse<[HistoryItem]> = try await query.execute()
+        return response.value
+    }
+    
+    // Method baru - tanpa filter tanggal (ambil semua history untuk equipment)
+    func fetchAllHistoryItems(equipmentID: UUID) async throws -> [HistoryItem] {
+        let query = client.from("history_items")
+            .select()
+            .eq("equipment_id", value: equipmentID)
+            .order("maintenance_date", ascending: false) // Sort by date descending
+
+        let response: PostgrestResponse<[HistoryItem]> = try await query.execute()
+        return response.value
     }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct EquipmentDetailView: View {
     @ObservedObject var equipment: Equipment
     @Environment(\.presentationMode) var presentationMode
+    @State private var navigateToHistory = false
     
     var body: some View {
         ScrollView {
@@ -69,7 +70,7 @@ struct EquipmentDetailView: View {
                     
                     // History Card Button
                     Button(action: {
-                        // Action untuk history card
+                        navigateToHistory = true
                     }) {
                         Text("Cek History Card")
                             .font(.body)
@@ -100,6 +101,13 @@ struct EquipmentDetailView: View {
                 }
             }
         )
+        .navigationDestination(isPresented: $navigateToHistory) {
+            // Langsung ke HistoryListView tanpa filter tanggal - ambil semua history
+            HistoryListView(
+                equipmentID: equipment.id,
+                equipmentName: equipment.assetName
+            )
+        }
     }
     
     private func formatDate(_ dateString: String) -> String {

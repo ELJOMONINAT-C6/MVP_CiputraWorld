@@ -6,23 +6,25 @@
 //
 
 import SwiftUI
-import SwiftData
+//import SwiftData
 import UIKit
 
-// Confirmation View before Submitting to Database
+//Confirmation View before Submitting to Database
 struct ConfirmationView: View {
     
-    // Stating Variables
-    let machine: String
-    let date: Date
-    let details: String
-    let notes: String?
-    let status: String
-    let technician: String
+    let historyItem: HistoryItem
     let image: UIImage
     let onSave: () -> Void
+    
+    // Stating Variables
+//    let machine: String
+//    let date: Date
+//    let details: String
+//    let notes: String?
+//    let status: String
+//    let technician: String
 
-    @Environment(\.modelContext) private var context
+//    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
     @State private var isSaving: Bool = false
@@ -39,7 +41,7 @@ struct ConfirmationView: View {
                     .padding()
 
                 VStack(spacing: 4) {
-                    Text(date.formatted(date: .abbreviated, time: .standard))
+                    Text(historyItem.maintenanceDate.formatted(date: .abbreviated, time: .standard))
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -92,17 +94,15 @@ struct ConfirmationView: View {
             // ✅ Tampilkan SuccessView setelah submit
             .fullScreenCover(isPresented: $showSuccessView) {
                 SuccessView(
-                    machine: machine,
-                    date: date,
-                    details: details,
-                    notes: notes,
-                    status: status,
-                    technician: technician,
-                    image: image
+                    machine: "Peralatan \(historyItem.equipmentID)",
+                     date: historyItem.maintenanceDate,
+                     details: historyItem.details,
+                     notes: historyItem.notes,
+                     status: historyItem.status,
+                     technician: historyItem.technician,
+                     image: image
                 )
             }
-            // ❌ Hapus alert sukses
-            // ✅ Tetap simpan alert error
             .alert("Error", isPresented: Binding(get: { saveError != nil }, set: { _ in saveError = nil })) {
                 Button("OK", role: .cancel) {}
             } message: {
@@ -110,52 +110,65 @@ struct ConfirmationView: View {
             }
         }
     }
-
-    // Submit Button Handler
+    
     private func submitRecord() {
         isSaving = true
         saveError = nil
 
-        guard let imageData = image.jpegData(compressionQuality: 0.85) else {
-            saveError = "Gagal memproses foto."
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             isSaving = false
-            return
-        }
-
-        let record = HistoryItem(
-            machine: machine,
-            date: date,
-            details: details,
-            notes: notes,
-            photoData: imageData,
-            status: status,
-            technician: technician,
-            spvStatus: "Pending",
-            hodStatus: "Pending"
-        )
-
-        context.insert(record)
-        do {
-            try context.save()
             onSave()
-            isSaving = false
-            showSuccessView = true   // 👈 pindah ke SuccessView
-        } catch {
-            isSaving = false
-            saveError = "Gagal menyimpan: \(error.localizedDescription)"
+            showSuccessView = true
         }
     }
+
+    // Submit Button Handler
+//    private func submitRecord() {
+//        isSaving = true
+//        saveError = nil
+//
+//        guard let imageData = image.jpegData(compressionQuality: 0.85) else {
+//            saveError = "Gagal memproses foto."
+//            isSaving = false
+//            return
+//        }
+//
+//        let record = HistoryItem(
+//            machine: machine,
+//            date: date,
+//            details: details,
+//            notes: notes,
+//            photoData: imageData,
+//            status: status,
+//            technician: technician,
+//            spvStatus: "Pending",
+//            hodStatus: "Pending"
+//        )
+//
+//        context.insert(record)
+//        do {
+//            try context.save()
+//            onSave()
+//            isSaving = false
+//            showSuccessView = true   // 👈 pindah ke SuccessView
+//        } catch {
+//            isSaving = false
+//            saveError = "Gagal menyimpan: \(error.localizedDescription)"
+//        }
+//    }
 }
 
 #Preview {
     ConfirmationView(
-        machine: "AC-Unit-01",
-        date: Date(),
-        details: "Perlu pengecekan filter udara.",
-        notes: "Filter agak kotor, perlu dibersihkan.",
-        status: "Pending",
-        technician: "Nathan Gunawan",
-        image: UIImage(systemName: "wrench.and.screwdriver")!, // sample SF Symbol as placeholder
+        historyItem: HistoryItem(
+            equipmentID: UUID(),
+            maintenanceDate: Date(),
+            details: "Perlu pengecekan filter udara.",
+            notes: "Filter agak kotor, perlu dibersihkan.",
+            status: "Pending",
+            technician: "Nathan Gunawan"
+        ),
+        image: UIImage(systemName: "wrench.and.screwdriver")!,
         onSave: {}
     )
 }

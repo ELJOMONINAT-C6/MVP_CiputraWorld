@@ -53,10 +53,8 @@ struct AddItemView: View {
             attributesDict["yPosition"] = String(format: "%.4f", loc.y)
         }
         
-        // Create a new item to insert
         Task {
             do {
-                // Insert item into Supabase
                 try await SupabaseManager.shared.insertEquipment(
                     assetID: idBarang,
                     assetName: namaItem,

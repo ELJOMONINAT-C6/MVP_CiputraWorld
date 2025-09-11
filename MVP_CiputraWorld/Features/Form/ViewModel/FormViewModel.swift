@@ -37,24 +37,31 @@ class FormViewModel: ObservableObject {
         isLoading = false
     }
     
+    // FormViewModel.swift
     func createHistoryItemPayload() -> HistoryItem? {
         guard isFormValid, let equipmentID = selectedEquipmentID else {
             return nil
         }
         
         let newHistory = HistoryItem(
-            id: UUID(),
             equipmentID: equipmentID,
             maintenanceDate: maintenanceDate,
             details: maintenanceDetails,
-            notes: additionalNotes,
-            photoURL: nil, // Akan diisi di CameraView
+            notes: additionalNotes.isEmpty ? nil : additionalNotes,
             status: maintenanceStatus,
-            technician: technicianName,
-            spvStatus: "pending", // Nilai default
-            hodStatus: "pending", // Nilai default
-            createdAt: Date()
+            technician: technicianName
         )
         return newHistory
+    }
+    
+    func resetForm() {
+        selectedEquipmentID = nil
+        technicianName = ""
+        maintenanceDetails = ""
+        maintenanceStatus = ""
+        additionalNotes = ""
+        maintenanceDate = Date()
+        showValidationErrors = false
+        isLoading = false
     }
 }

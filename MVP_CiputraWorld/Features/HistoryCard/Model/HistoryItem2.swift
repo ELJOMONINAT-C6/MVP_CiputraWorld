@@ -1,14 +1,14 @@
+////
+////  HistoryItem2.swift
+////  MVP_CiputraWorld
+////
+////  Created by Kezia Elice on 01/09/25.
+////
 //
-//  HistoryItem2.swift
-//  MVP_CiputraWorld
+//import Foundation
 //
-//  Created by Kezia Elice on 01/09/25.
-//
-
-import Foundation
-
-struct HistoryItem2: Identifiable {
-    let id = UUID()
-    let title: String
-    let date: Date
-}
+//struct HistoryItem2: Identifiable {
+//    let id = UUID()
+//    let title: String
+//    let date: Date
+//}

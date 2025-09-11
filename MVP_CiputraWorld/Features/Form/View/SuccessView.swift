@@ -16,7 +16,8 @@ struct SuccessView: View {
     let technician: String
     let image: UIImage?
 
-    @Environment(\.dismiss) private var dismiss
+//    @Environment(\.dismiss) private var dismiss
+    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ScrollView {
@@ -71,15 +72,17 @@ struct SuccessView: View {
                 Spacer(minLength: 24)
 
                 // Proceed Button
-                Button(action: { dismiss() }) {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
                     HStack {
                         Image(systemName: "checkmark.circle.fill")
-                        Text("Proceed")
+                        Text("OK")
                             .fontWeight(.semibold)
                     }
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color(red: 94/255, green: 92/255, blue: 230/255)) // sama kayak tombol "Ambil Gambar"
+                    .background(Color(red: 94/255, green: 92/255, blue: 230/255))
                     .foregroundColor(.white)
                     .cornerRadius(12)
                 }
@@ -103,7 +106,7 @@ struct SuccessView: View {
         date: Date(),
         details: "Perlu pengecekan filter udara.",
         notes: "Filter agak kotor, perlu dibersihkan.",
-        status: "Pending",
+        status: "Maintenance Selesai",
         technician: "Nathan Gunawan",
         image: UIImage(systemName: "wrench.and.screwdriver")
     )
