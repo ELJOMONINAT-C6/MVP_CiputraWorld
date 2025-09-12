@@ -14,47 +14,47 @@ struct EquipmentPointView: View {
     let isSelected: Bool
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel
     
-    //    private var iconView: some View {
-    //        let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
-    //
-    //        switch categoryToUse {
-    //        case "AHU":
-    //            // External asset
-    //            return AnyView(
-    //                Image("ahu_icon")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
-    //            )
-    //        case "AC":
-    //            // External asset
-    //            return AnyView(
-    //                Image("ac_icon")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
-    //            )
-    //        case "FAN":
-    //            // Built-in SF Symbol
-    //            return AnyView(
-    //                Image(systemName: "fanblades.fill")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
-    //                    .foregroundColor(.white) // keep it visible
-    //            )
-    //        default:
-    //            // Fallback SF Symbol
-    //            return AnyView(
-    //                Image(systemName: "questionmark.circle.fill")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
-    //                    .foregroundColor(.white)
-    //            )
-    //        }
-    //    }
-    
+    private var iconView: some View {
+        let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
+
+        switch categoryToUse {
+        case "AHU":
+            // External asset
+            return AnyView(
+                Image("ahu_icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+            )
+        case "AC":
+            // External asset
+            return AnyView(
+                Image("ac_icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+            )
+        case "FAN":
+            // Built-in SF Symbol
+            return AnyView(
+                Image(systemName: "fanblades.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+                    .foregroundColor(.white) // keep it visible
+            )
+        default:
+            // Fallback SF Symbol
+            return AnyView(
+                Image(systemName: "questionmark.circle.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+                    .foregroundColor(.white)
+            )
+        }
+    }
+
     private var pointColor: Color {
         let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
         
@@ -75,7 +75,7 @@ struct EquipmentPointView: View {
     }
     
     var body: some View {
-//        ZStack {
+        ZStack {
             Circle()
                 .fill(pointColor)
                 .frame(width: pointSize, height: pointSize)
@@ -83,8 +83,8 @@ struct EquipmentPointView: View {
                     Circle()
                         .stroke(isSelected ? Color.red : Color.white, lineWidth: isSelected ? 3 : 2)
                 )
-        //        iconView
-//        }
+                iconView
+        }
         .overlay(
             Group {
                 if isSelected {

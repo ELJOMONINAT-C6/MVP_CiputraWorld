@@ -15,6 +15,7 @@ struct CategoryFilterView: View {
     var body: some View {
         HStack(spacing: 12) {
             CategoryLabel(
+                iconType: "AHU",
                 color: Color("blue-cw"),
                 text: "AHU",
                 isSelected: mapViewModel.selectedCategory == "AHU",
@@ -24,6 +25,7 @@ struct CategoryFilterView: View {
             )
             
             CategoryLabel(
+                iconType: "FAN",
                 color: Color("red-point"),
                 text: "FAN",
                 isSelected: mapViewModel.selectedCategory == "FAN",
@@ -33,6 +35,7 @@ struct CategoryFilterView: View {
             )
             
             CategoryLabel(
+                iconType: "AC",
                 color: Color("green-point"),
                 text: "AC",
                 isSelected: mapViewModel.selectedCategory == "AC",
@@ -46,51 +49,51 @@ struct CategoryFilterView: View {
 
 // Single category component
 struct CategoryLabel: View {
-    //    var iconType: String
+    var iconType: String
     var color: Color
     var text: String
     var isSelected: Bool = false
     var onTap: () -> Void
     
-    //    @ViewBuilder
-    //    private var iconView: some View {
-    //        ZStack {
-    //            Circle()
-    //                .fill(color)
-    //                .frame(width: 24, height: 24)
-    //
-    //            switch iconType {
-    //            case "AHU":
-    //                Image("ahu_icon")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: 14, height: 14)
-    //                    .foregroundColor(.white)
-    //
-    //            case "AC":
-    //                Image("ac_icon")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: 14, height: 14)
-    //                    .foregroundColor(.white)
-    //
-    //            case "FAN":
-    //                Image(systemName: "fanblades.fill")
-    //                    .resizable()
-    //                    .scaledToFit()
-    //                    .frame(width: 14, height: 14)
-    //                    .foregroundColor(.white)
-    //
-    //            default:
-    //                EmptyView()
-    //            }
-    //        }
-    //    }
+    @ViewBuilder
+    private var iconView: some View {
+        ZStack {
+            Circle()
+                .fill(color)
+                .frame(width: 24, height: 24)
+
+            switch iconType {
+            case "AHU":
+                Image("ahu_icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 14, height: 14)
+                    .foregroundColor(.white)
+
+            case "AC":
+                Image("ac_icon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 14, height: 14)
+                    .foregroundColor(.white)
+
+            case "FAN":
+                Image(systemName: "fanblades.fill")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 14, height: 14)
+                    .foregroundColor(.white)
+
+            default:
+                EmptyView()
+            }
+        }
+    }
     
     var body: some View {
         HStack() {
-            //yang bener pengganti circle
-//            iconView
+            iconView
+            
             Circle()
                 .fill(color)
                 .frame(width: 20, height: 20)
