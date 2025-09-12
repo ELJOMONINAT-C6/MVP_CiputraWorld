@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+extension Color {
+    static var label: Color {
+        Color(uiColor: .label)
+    }
+}
+
 struct SuccessView: View {
     let machine: String
     let date: Date
@@ -16,8 +22,8 @@ struct SuccessView: View {
     let technician: String
     let image: UIImage?
 
-//    @Environment(\.dismiss) private var dismiss
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
+//    @Environment(\.presentationMode) var presentationMode
 
     var body: some View {
         ScrollView {
@@ -73,19 +79,21 @@ struct SuccessView: View {
 
                 // Proceed Button
                 Button(action: {
-                    presentationMode.wrappedValue.dismiss()
+                    dismiss()
+                    dismiss()
                 }) {
                     HStack {
                         Image(systemName: "checkmark.circle.fill")
                         Text("OK")
-                            .fontWeight(.semibold)
+                            .fontWeight(.bold)
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(red: 94/255, green: 92/255, blue: 230/255))
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
+                    .frame(maxWidth: .infinity, minHeight: 35)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(.backgroundClr)
+                .foregroundColor(.foregroundClr)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
             }
             .padding()
         }
@@ -96,7 +104,7 @@ struct SuccessView: View {
         Text(text)
             .font(.subheadline)
             .fontWeight(.semibold)
-            .foregroundColor(.black)
+            .foregroundColor(.label)
     }
 }
 

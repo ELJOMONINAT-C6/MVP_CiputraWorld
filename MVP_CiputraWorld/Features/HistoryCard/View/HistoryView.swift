@@ -9,6 +9,14 @@ import Foundation
 import SwiftUI
 
 struct HistoryView: View {
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize: DynamicTypeSize
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
+    
     @State private var selectedEquipmentID: UUID? = nil
     @State private var suggestedEquipment: String = ""
     @State private var startDate = Date()
@@ -17,7 +25,6 @@ struct HistoryView: View {
     
     @StateObject private var viewModel = HistoryViewModel()
     
-    // Computed property untuk mendapatkan equipment yang dipilih
     private var selectedEquipment: Equipment? {
         viewModel.equipments.first { $0.id == selectedEquipmentID }
     }
@@ -27,52 +34,67 @@ struct HistoryView: View {
             VStack {
                 Form {
                     Section {
-                        // Simplified Picker dengan UUID selection
-                        Picker("Jenis Alat", selection: $selectedEquipmentID) {
+                        Picker("Nama Alat", selection: $selectedEquipmentID) {
                             Text("Pilih Peralatan").tag(nil as UUID?)
                             ForEach(viewModel.equipments, id: \.id) { equipment in
                                 Text(equipment.assetName)
                                     .tag(equipment.id as UUID?)
                             }
                         }
+                        .pickerStyle(.navigationLink)
+                        .accessibilityHint("Pilih nama alat")
                         .onChange(of: selectedEquipmentID) { _, newValue in
-                            // Auto-fill kode alat saat equipment dipilih
+                            // Auto-fill code when the equipment is selected
                             if let equipmentID = newValue,
                                let equipment = viewModel.equipments.first(where: { $0.id == equipmentID }) {
                                 suggestedEquipment = equipment.assetID
                             }
                         }
                         
-                        HStack {
+                        dynamicLayout {
                             Text("Kode Alat")
                             Spacer()
                             TextField("Masukkan Kode Alat", text: $suggestedEquipment)
                                 .multilineTextAlignment(.trailing)
                                 .foregroundStyle(.secondary)
                                 .onChange(of: suggestedEquipment) { _, newValue in
-                                    // Sync selection jika user manual input kode alat
                                     syncEquipmentSelection(from: newValue)
                                 }
                         }
+                        
                     } header: {
-                        Text("JENIS PERALATAN")
+                        Text("Peralatan")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
                     
                     Section {
-                        DatePicker(
-                            "Dari tanggal",
-                            selection: $startDate,
-                            displayedComponents: [.date]
-                        )
-                        DatePicker(
-                            "Sampai tanggal",
-                            selection: $endDate,
-                            displayedComponents: [.date]
-                        )
+                        dynamicLayout {
+                           Text("Dari tanggal")
+                           Spacer()
+                           DatePicker(
+                               "",
+                               selection: $startDate,
+                               displayedComponents: [.date]
+                           )
+                           .labelsHidden()
+                           .accessibilityLabel("Tanggal mulai")
+                           .accessibilityHint("Pilih tanggal awal periode pencarian")
+                       }
+                       dynamicLayout {
+                           Text("Sampai tanggal")
+                           Spacer()
+                           DatePicker(
+                               "",
+                               selection: $endDate,
+                               displayedComponents: [.date]
+                           )
+                           .labelsHidden()
+                           .accessibilityLabel("Tanggal selesai")
+                           .accessibilityHint("Pilih tanggal akhir periode pencarian")
+                       }
                     } header: {
-                        Text("PERIODE")
+                        Text("Rentang Riwayat")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
@@ -81,12 +103,16 @@ struct HistoryView: View {
                         handleSubmit()
                     }) {
                         Text("Lihat Informasi")
-                            .frame(maxWidth: .infinity)
+                            .bold()
+                            .frame(maxWidth: .infinity, minHeight: 35)
                     }
                     .disabled(!isFormValid())
                     .buttonStyle(.borderedProminent)
-                    .tint(.interactiveClr)
-                    .foregroundColor(.textClr)
+                    .tint(.backgroundClr)
+                    .foregroundColor(.foregroundClr)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(EdgeInsets())
+                    .accessibilityHint("Tekan untuk mencari history card sesuai filter")
                 }
                 .navigationDestination(isPresented: $searchHistory) {
                     if let equipmentID = getValidEquipmentID() {
@@ -107,8 +133,6 @@ struct HistoryView: View {
             }
         }
     }
-    
-    // MARK: - Helper Methods
     
     private func syncEquipmentSelection(from assetID: String) {
         // Cari equipment berdasarkan assetID yang diinput manual
@@ -150,123 +174,6 @@ struct HistoryView: View {
         searchHistory = true
     }
 }
-
-
-
-//enum Category: String, CaseIterable, Identifiable {
-//    case ac = "Air Conditioner"
-//    case ahu = "AHU"
-//
-//    var id: String { self.rawValue }
-//}
-//
-//enum Equipment2: String, CaseIterable, Identifiable {
-//    case AC0102, AHU0101
-//    var id: Self { self }
-//}
-//
-//
-//extension Category {
-//    var suggestedEquipment: Equipment2 {
-//        switch self {
-//        case .ac: return .AC0102
-//        case .ahu: return .AHU0101
-//        }
-//    }
-//}
-//
-//struct HistoryView: View {
-//    @State private var selectedCategory: Category = .ac
-//    @State private var suggestedEquipment: String = Category.ac.suggestedEquipment.rawValue
-//    @State private var startDate = Date()
-//    @State private var endDate = Date()
-//    @State private var searchHistory = false
-//
-//    var body: some View {
-//        NavigationStack {
-//            VStack {
-//                Form {
-//                    Section {
-//                        Picker("Jenis Alat", selection: $selectedCategory) {
-//                            ForEach(Category.allCases) { category in
-//                                Text(category.rawValue)
-//                                    .tag(category)
-//                            }
-//                        }
-//                        .accessibilityHint("Pilih kategori peralatan")
-//                        .onChange(of: selectedCategory) { newValue in
-//                            suggestedEquipment = newValue.suggestedEquipment.rawValue
-//                        }
-//                        HStack {
-//                            Text("Kode Alat")
-//                            Spacer()
-//                            TextField("Masukkan Kode Alat", text: $suggestedEquipment)
-//                                .multilineTextAlignment(.trailing)
-//                                .foregroundStyle(.secondary)
-//                                .accessibilityHint("Masukkan kode peralatan secara manual")
-//                        }
-//                    } header: {
-//                        Text("JENIS PERALATAN")
-//                            .font(.caption)
-//                            .foregroundColor(.secondary)
-//                    }
-//                    
-//                    Section {
-//                        DatePicker(
-//                            "Dari tanggal",
-//                            selection: $startDate,
-//                            displayedComponents: [.date]
-//                        )
-//                        .accessibilityLabel("Tanggal mulai")
-//                        .accessibilityHint("Pilih tanggal awal periode pencarian")
-//                        DatePicker(
-//                            "Sampai tanggal",
-//                            selection: $endDate,
-//                            displayedComponents: [.date]
-//                        )
-//                        .accessibilityLabel("Tanggal selesai")
-//                        .accessibilityHint("Pilih tanggal akhir periode pencarian")
-//                    } header: {
-//                        Text("PERIODE")
-//                            .font(.caption)
-//                            .foregroundColor(.secondary)
-//                    }
-//                    Button(action: {handleSubmit(); searchHistory = true}) {
-//                        Text("Lihat Informasi")
-//                            .frame(maxWidth: .infinity)
-//                    }
-//                    .disabled(suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty)
-//                    .buttonStyle(.borderedProminent)
-//                    .tint(.interactiveClr)
-//                    .foregroundColor(.textClr)
-//                    .listRowBackground(Color.clear)
-//                    .listRowInsets(EdgeInsets())
-//                    .accessibilityHint("Tekan untuk mencari history card sesuai filter")
-//                }
-//                .navigationDestination(isPresented: $searchHistory) {
-//                    HistoryListView(
-//                        category: selectedCategory,
-//                        kodeAlat: suggestedEquipment,
-//                        startDate: startDate,
-//                        endDate: endDate
-//                    )
-//                }
-//            }
-////            .environment(\.locale, Locale(identifier: "id"))
-//            .navigationTitle("Cari History Card")
-//        }
-//    }
-//    
-//    private func handleSubmit() {
-//        guard !suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty else {
-//            print("Equipment ID is empty")
-//            return
-//        }
-//        print("Submit data: \(selectedCategory.rawValue) \(suggestedEquipment) \(startDate) to \(endDate)")
-//    }
-//
-//}
-//
 
 #Preview {
     HistoryView()

@@ -10,22 +10,44 @@ import SwiftUI
 
 struct HistoryDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.dynamicTypeSize)  private var dynamicTypeSize
+    @GestureState private var dragOffset: CGFloat = 0
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
     
     let history: HistoryItem
     
     var body: some View {
         ScrollView {
             VStack {
-                Image(systemName: "photo") // Ganti dengan foto jika ada
-                    .resizable()
-                    .scaledToFill()
+                if let photoURL = history.photoURL, !photoURL.isEmpty { AsyncImage(url: URL(string: photoURL))
+                    { image in image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .scaledToFit()
+                    }
                     .frame(height: 250)
                     .clipped()
                     .cornerRadius(16)
+                } else {
+                    Image(systemName: "photo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 250)
+                        .foregroundColor(.gray)
+                        .background(Color.gray.opacity(0.1))
+                        .cornerRadius(16)
+                }
             }
             .padding(.horizontal, 16)
             VStack(alignment: .leading, spacing: 8) {
-                Text(history.details) // Ganti dengan detail yang sesuai
+                Text(history.details)
                     .font(.title2)
                     .fontWeight(.semibold)
                 Text(history.maintenanceDate.formatted(date: .abbreviated, time: .omitted))
@@ -36,14 +58,14 @@ struct HistoryDetailView: View {
                 Text("Status Unit: \(history.status)")
                     .font(.subheadline)
                 Spacer()
-                HStack {
+                dynamicLayout {
                     Text("Status Supervisor:")
                     Text(history.spvStatus)
                         .foregroundColor(.green)
                         .fontWeight(.semibold)
                 }
                 .font(.subheadline)
-                HStack {
+                dynamicLayout {
                     Text("Head of Department Status:")
                     Text(history.hodStatus)
                         .foregroundColor(.red)
@@ -75,84 +97,16 @@ struct HistoryDetailView: View {
                 }
             }
         }
+        .gesture(
+            DragGesture()
+                .updating($dragOffset) { value, state, _ in
+                    state = value.translation.width
+                }
+                .onEnded { value in
+                    if value.translation.width > 100 && abs(value.translation.height) < 50 {
+                        dismiss()
+                    }
+                }
+        )
     }
 }
-
-
-//struct HistoryDetailView: View {
-//    @Environment(\.dismiss) var dismiss
-//    
-//    let history: HistoryItem2
-//    
-//    var body: some View {
-//        ScrollView {
-//            VStack {
-//                Image("H01")
-//                    .resizable()
-//                    .scaledToFill()
-//                    .frame(height: 250)
-//                    .clipped()
-//                    .cornerRadius(16)
-//            }
-//            .padding(.horizontal, 16)
-//            VStack(alignment: .leading, spacing: 8) {
-//                Text(history.title)
-//                    .font(.title2)
-//                    .fontWeight(.semibold)
-//                Text(history.date.formatted(date: .abbreviated, time: .omitted))
-//                    .font(.subheadline)
-//                    .foregroundColor(.secondary)
-//                Text("Nama Teknisi: Suprianto")
-//                    .font(.subheadline)
-//                Text("Status Unit: Maintenance Selesai")
-//                    .font(.subheadline)
-//                Spacer()
-//                HStack {
-//                    Text("Status Supervisor:")
-//                    Text("Approved")
-//                        .foregroundColor(.green)
-//                        .fontWeight(.semibold)
-//                }
-//                .font(.subheadline)
-//                HStack {
-//                    Text("Head of Department Status:")
-//                    Text("Pending")
-//                        .foregroundColor(.red)
-//                        .fontWeight(.semibold)
-//                }
-//                .font(.subheadline)
-//                Text("Keterangan: Maintenance AHU-AC 01")
-//                    .font(.subheadline)
-//            }
-//            .padding()
-//            .frame(maxWidth: .infinity, alignment: .leading)
-//            .background(Color(uiColor: .secondarySystemBackground))
-//            .cornerRadius(16)
-//            .padding()
-//            .shadow(radius: 4)
-//        }
-//        .navigationTitle("Informasi Item")
-//        .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(true)
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                HStack {
-//                    Image(systemName: "chevron.left")
-//                    Text("Back")
-//                }
-//                .foregroundColor(.accentColor)
-//                .onTapGesture {
-//                    dismiss()
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//#Preview {
-//    HistoryDetailView(history: HistoryItem2(
-//        title: "Mengganti Kapasitor",
-//        date: Calendar.current.date(from: DateComponents(year: 2025, month: 9, day: 1))!
-//    ))
-////    HistoryDetailView()
-//}

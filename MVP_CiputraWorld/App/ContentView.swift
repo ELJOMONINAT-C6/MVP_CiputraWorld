@@ -14,9 +14,11 @@ struct ContentView: View {
     init() {
         let appearance = UITabBarAppearance()
         appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(named: "darkblue")
-        appearance.stackedLayoutAppearance.selected.iconColor = .textClr
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.textClr]
+        appearance.backgroundColor = UIColor.foregroundClr
+        
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.label
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.label]
+        
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
     }
@@ -30,7 +32,7 @@ struct ContentView: View {
 
             InputView()
             .tabItem {
-                Label("Tambah", systemImage: "plus")
+                Label("Maintenance", systemImage: "plus")
             }
 
             HistoryView()

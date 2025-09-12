@@ -11,6 +11,15 @@ import SwiftUI
 struct HistoryListView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var viewModel = HistoryViewModel()
+    @GestureState private var dragOffset: CGFloat = 0
+    
+    @Environment(\.dynamicTypeSize)
+    private var dynamicTypeSize: DynamicTypeSize
+    
+    var dynamicLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize ?
+        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+    }
     
     let equipmentID: UUID
     let equipmentName: String
@@ -38,7 +47,7 @@ struct HistoryListView: View {
             NavigationLink {
                 HistoryDetailView(history: history)
             } label: {
-                HStack {
+                dynamicLayout {
                     Text(history.details)
                         .font(.body)
                     Spacer()
@@ -79,55 +88,17 @@ struct HistoryListView: View {
                 }
             }
         }
+        .gesture(
+            DragGesture()
+                .updating($dragOffset) { value, state, _ in
+                    state = value.translation.width
+                }
+                .onEnded { value in
+                    // cek kalau swipe cukup jauh ke kanan
+                    if value.translation.width > 100 && abs(value.translation.height) < 50 {
+                        dismiss()
+                    }
+                }
+        )
     }
 }
-
-//struct HistoryListView: View {
-//    @Environment(\.dismiss) var dismiss
-//    @StateObject private var viewModel = HistoryViewModel1()
-//
-//    let category: Category
-//    let kodeAlat: String
-//    let startDate: Date
-//    let endDate: Date
-//
-//    var body: some View {
-//        List(viewModel.histories) { history in
-//            NavigationLink {
-//                HistoryDetailView(history: history)
-//            } label: {
-//                HStack {
-//                    Text(history.title)
-//                        .font(.body)
-//                    Spacer()
-//                    Text(history.date.formatted(date: .abbreviated, time: .omitted))
-//                        .font(.subheadline)
-//                        .foregroundColor(.secondary)
-//                }
-//                .padding(.vertical, 4)
-//            }
-//        }
-//        .navigationTitle("History")
-//        .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(true)
-//        .toolbar {
-//            ToolbarItem(placement: .navigationBarLeading) {
-//                HStack {
-//                    Image(systemName: "chevron.left")
-//                    Text("Back")
-//                }
-//                .foregroundColor(.accentColor)
-//                .onTapGesture {
-//                    dismiss()
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//#Preview {
-//    HistoryListView(category: .ac,
-//                    kodeAlat: "AC0102",
-//                    startDate: Date(),
-//                    endDate: Date())
-//}

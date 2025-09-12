@@ -18,7 +18,7 @@ struct AttributeNameTextFieldStyle: TextFieldStyle {
                 RoundedRectangle(cornerRadius: 6)
                     .stroke(Color(.systemGray4), lineWidth: 1)
             )
-            .font(.system(size: 14, weight: .medium))
+            .environment(\.font, .body)
     }
 }
 
@@ -29,13 +29,13 @@ struct RequiredTextFieldStyle: TextFieldStyle {
         configuration
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Color.white)
+            .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(isEmpty ? Color.red : Color(.systemGray4), lineWidth: isEmpty ? 2 : 1)
             )
-            .font(.system(size: 16))
+            .environment(\.font, .body)
     }
 }
 
@@ -44,12 +44,12 @@ struct CustomTextFieldStyle: TextFieldStyle {
         configuration
             .padding(.horizontal, 16)
             .padding(.vertical, 12)
-            .background(Color.white)
+            .background(Color(UIColor.secondarySystemBackground))
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(Color(.systemGray4), lineWidth: 1)
             )
-            .font(.system(size: 16))
+            .environment(\.font, .body)
     }
 }

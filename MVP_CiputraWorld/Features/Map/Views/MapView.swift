@@ -15,6 +15,8 @@ struct MapView: View {
     @State private var mapOffset: CGSize = .zero
     @State private var showingSearchResults = false
     
+    @Environment(\.dismiss) var dismiss
+    
     let floorName: String
     
     init(floorName: String, mapViewModel: EquipmentFilteringViewModel) {
@@ -127,6 +129,16 @@ struct MapView: View {
         .onChange(of: mapViewModel.searchText) { _, newValue in
             showingSearchResults = !newValue.isEmpty && !searchResults.isEmpty
         }
+        .simultaneousGesture(
+             DragGesture()
+                 .onEnded { value in
+                     if value.startLocation.x < 30 && value.translation.width > 50 {
+                         withAnimation {
+                             dismiss()
+                         }
+                     }
+                 }
+         )
     }
     
     private func resetMapView() {
@@ -139,4 +151,3 @@ struct MapView: View {
 #Preview {
     MapView(floorName: "Basement", mapViewModel: EquipmentFilteringViewModel())
 }
-

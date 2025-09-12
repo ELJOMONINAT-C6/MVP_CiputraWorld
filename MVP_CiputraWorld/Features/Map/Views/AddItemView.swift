@@ -187,7 +187,7 @@ struct AddItemView: View {
                         }
                     }
                     .padding(16)
-                    .background(Color.white)
+                    .background(Color(UIColor.systemBackground))
                     .cornerRadius(8)
                     .overlay(
                         RoundedRectangle(cornerRadius: 6)
@@ -201,17 +201,26 @@ struct AddItemView: View {
                     //Edit lokasi
                     if selectedLocation != nil {
                         NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
-                            Text("Edit Lokasi") .font(.system(size: 16, weight: .medium)) .foregroundColor(.white) .frame(maxWidth: .infinity) .frame(height: 50) .background(Color.gray) .cornerRadius(8) .padding(.horizontal, 20) } .padding(.bottom, 10) }
+                            Text("Edit Lokasi")
+                                .font(.body.weight(.medium))
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(Color.gray)
+                                .cornerRadius(8)
+                                .padding(.horizontal, 20) }
+                                .padding(.bottom, 10)
+                    }
                     
                     //Tambah Lokasi & Simpan
                     if selectedLocation == nil {
                         NavigationLink(destination: LocationPickerView(selectedLocation: $selectedLocation)) {
                             Text("Tambahkan Lokasi")
-                                .font(.system(size: 16, weight: .medium))
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
+                                .padding()
+                                .font(.body.weight(.medium))
+                                .foregroundColor(Color.foregroundClr)
+                                .frame(maxWidth: .infinity, minHeight: 50)
+                                .background(isFormValid ? Color.backgroundClr : Color.gray)
                                 .cornerRadius(8)
                         }
                         .disabled(!isFormValid)
@@ -220,7 +229,7 @@ struct AddItemView: View {
                     } else {
                         Button(action: handleSave) {
                             Text("Simpan")
-                                .font(.system(size: 16, weight: .medium))
+                                .font(.body.weight(.medium))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)

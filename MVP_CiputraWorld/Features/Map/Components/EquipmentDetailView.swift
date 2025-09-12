@@ -10,6 +10,8 @@ import SwiftUI
 struct EquipmentDetailView: View {
     @ObservedObject var equipment: Equipment
     @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) var dismiss
+    @GestureState private var dragOffset: CGFloat = 0
     @State private var navigateToHistory = false
     
     var body: some View {
@@ -28,8 +30,8 @@ struct EquipmentDetailView: View {
                         .background(Color.gray.opacity(0.1))
                 }
                 
+                //Mandatory Attributes
                 VStack() {
-                    // Equipment Name and Basic Info
                     VStack(alignment: .leading, spacing: 16) {
                         Text(equipment.assetName)
                             .font(.title2)
@@ -75,10 +77,10 @@ struct EquipmentDetailView: View {
                         Text("Cek History Card")
                             .font(.body)
                             .fontWeight(.medium)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.foregroundClr)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color("darkblue"))
+                            .background(Color.backgroundClr)
                             .cornerRadius(10)
                     }
                     .padding(.top, 20)
@@ -108,6 +110,18 @@ struct EquipmentDetailView: View {
                 equipmentName: equipment.assetName
             )
         }
+        .gesture(
+            DragGesture()
+                .updating($dragOffset) { value, state, _ in
+                    state = value.translation.width
+                }
+                .onEnded { value in
+                    if value.translation.width > 100 && abs(value.translation.height) < 50 {
+                        dismiss()
+                    }
+                }
+        )
+
     }
     
     private func formatDate(_ dateString: String) -> String {

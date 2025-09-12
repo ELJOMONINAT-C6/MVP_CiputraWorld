@@ -14,6 +14,47 @@ struct EquipmentPointView: View {
     let isSelected: Bool
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel
     
+    //    private var iconView: some View {
+    //        let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
+    //
+    //        switch categoryToUse {
+    //        case "AHU":
+    //            // External asset
+    //            return AnyView(
+    //                Image("ahu_icon")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+    //            )
+    //        case "AC":
+    //            // External asset
+    //            return AnyView(
+    //                Image("ac_icon")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+    //            )
+    //        case "FAN":
+    //            // Built-in SF Symbol
+    //            return AnyView(
+    //                Image(systemName: "fanblades.fill")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+    //                    .foregroundColor(.white) // keep it visible
+    //            )
+    //        default:
+    //            // Fallback SF Symbol
+    //            return AnyView(
+    //                Image(systemName: "questionmark.circle.fill")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: pointSize * 0.6, height: pointSize * 0.6)
+    //                    .foregroundColor(.white)
+    //            )
+    //        }
+    //    }
+    
     private var pointColor: Color {
         let categoryToUse = mapViewModel.selectedCategory ?? equipment.equipmentType
         
@@ -30,32 +71,35 @@ struct EquipmentPointView: View {
     }
     
     private var pointSize: CGFloat {
-        return isSelected ? 16 : 12
+        return isSelected ? 24 : 18
     }
     
     var body: some View {
-        Circle()
-            .fill(pointColor)
-            .frame(width: pointSize, height: pointSize)
-            .overlay(
-                Circle()
-                    .stroke(isSelected ? Color.red : Color.white, lineWidth: isSelected ? 3 : 2)
-            )
-            .overlay(
-                // Pulse animation for selected equipment
-                Group {
-                    if isSelected {
-                        Circle()
-                            .stroke(pointColor.opacity(0.4), lineWidth: 2)
-                            .scaleEffect(1.5)
-                            .opacity(0.6)
-                            .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isSelected)
-                    }
+//        ZStack {
+            Circle()
+                .fill(pointColor)
+                .frame(width: pointSize, height: pointSize)
+                .overlay(
+                    Circle()
+                        .stroke(isSelected ? Color.red : Color.white, lineWidth: isSelected ? 3 : 2)
+                )
+        //        iconView
+//        }
+        .overlay(
+            Group {
+                if isSelected {
+                    Circle()
+                        .stroke(pointColor.opacity(0.4), lineWidth: 2)
+                        .scaleEffect(1.5)
+                        .opacity(0.6)
+                        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isSelected)
                 }
-            )
-            .position(
-                x: equipment.xPosition,  // Menggunakan xPosition dari sampleEquipment
-                y: equipment.yPosition   // Menggunakan yPosition dari sampleEquipment
-            )
+            }
+        )
+        .position(
+            x: equipment.xPosition,
+            y: equipment.yPosition
+        )
+        //.accessibilityHint("Tap here to see \(equipment.assetName) with ID \(equipment.assetID) details")
     }
 }

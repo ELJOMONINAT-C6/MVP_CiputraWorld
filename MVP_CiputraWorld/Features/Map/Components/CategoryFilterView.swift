@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-// MARK: - Komponen untuk Filter Kategori
+//View for all category
 struct CategoryFilterView: View {
     @ObservedObject var mapViewModel: EquipmentFilteringViewModel
         
@@ -44,15 +44,53 @@ struct CategoryFilterView: View {
     }
 }
 
-// MARK: - Komponen untuk Label Tunggal
+// Single category component
 struct CategoryLabel: View {
+    //    var iconType: String
     var color: Color
     var text: String
-    var isSelected: Bool = false // Tambah state selected
-    var onTap: () -> Void // Tambah action
+    var isSelected: Bool = false
+    var onTap: () -> Void
+    
+    //    @ViewBuilder
+    //    private var iconView: some View {
+    //        ZStack {
+    //            Circle()
+    //                .fill(color)
+    //                .frame(width: 24, height: 24)
+    //
+    //            switch iconType {
+    //            case "AHU":
+    //                Image("ahu_icon")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: 14, height: 14)
+    //                    .foregroundColor(.white)
+    //
+    //            case "AC":
+    //                Image("ac_icon")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: 14, height: 14)
+    //                    .foregroundColor(.white)
+    //
+    //            case "FAN":
+    //                Image(systemName: "fanblades.fill")
+    //                    .resizable()
+    //                    .scaledToFit()
+    //                    .frame(width: 14, height: 14)
+    //                    .foregroundColor(.white)
+    //
+    //            default:
+    //                EmptyView()
+    //            }
+    //        }
+    //    }
     
     var body: some View {
         HStack() {
+            //yang bener pengganti circle
+//            iconView
             Circle()
                 .fill(color)
                 .frame(width: 20, height: 20)
@@ -61,21 +99,20 @@ struct CategoryLabel: View {
             
             Text(text)
                 .font(.caption)
-                .foregroundColor(.primary)
+                .foregroundColor(isSelected ? Color.black : .primary)
             
             Spacer()
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(isSelected ? color.opacity(0.1) : Color.white)
+        .background(isSelected ? color.opacity(0.1) : Color(UIColor.systemBackground))
         .frame(maxWidth: 100)
         .cornerRadius(15)
         .overlay(
-            // Border jika dipilih
             RoundedRectangle(cornerRadius: 15)
                 .stroke(isSelected ? color : Color.clear, lineWidth: 2)
         )
-        .onTapGesture { // Tambah tap gesture
+        .onTapGesture {
             onTap()
         }
     }

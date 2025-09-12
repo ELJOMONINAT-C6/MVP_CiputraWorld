@@ -6,169 +6,115 @@
 //
 
 import SwiftUI
-//import SwiftData
 import UIKit
 
-//Confirmation View before Submitting to Database
+@MainActor
 struct ConfirmationView: View {
-    
     let historyItem: HistoryItem
-    let image: UIImage
-    let onSave: () -> Void
+    let capturedImage: UIImage
     
-    // Stating Variables
-//    let machine: String
-//    let date: Date
-//    let details: String
-//    let notes: String?
-//    let status: String
-//    let technician: String
-
-//    @Environment(\.modelContext) private var context
-    @Environment(\.dismiss) private var dismiss
-
-    @State private var isSaving: Bool = false
-    @State private var saveError: String? = nil
-    @State private var showSuccessView: Bool = false   // 👈 NEW
-
+    @Environment(\.dismiss) private var dismiss // Gunakan ini untuk kembali
+    
+    @State private var isUploading = false
+    @State private var showingAlert = false
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    
+    @State private var navigateToSuccessView = false
+    
     var body: some View {
-        NavigationView {
-            VStack(spacing: 16) {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFit()
-                    .cornerRadius(12)
+        VStack(spacing: 20) {
+            Image(uiImage: capturedImage)
+                .resizable()
+                .scaledToFit()
+                .frame(maxHeight: 360)
+                .cornerRadius(12)
+                .padding()
+            
+            if isUploading {
+                ProgressView("Mengunggah dan menyimpan data...")
                     .padding()
-
-                VStack(spacing: 4) {
-                    Text(historyItem.maintenanceDate.formatted(date: .abbreviated, time: .standard))
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
-                
-                // Foto Ulang Button
-                Button(action: { dismiss() }) {
-                    HStack {
-                        Image(systemName: "camera.fill")
-                        Text("Foto Ulang")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal, 24)
-                }
-                
-                // Submit Button
-                Button(action: submitRecord) {
-                    HStack {
-                        if isSaving {
-                            ProgressView()
-                                .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        }
-                        Text(isSaving ? "Menyimpan..." : "Submit")
-                            .fontWeight(.semibold)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color(red: 15/255, green: 22/255, blue: 58/255)) // navy color
-                    .foregroundColor(.white)
-                    .cornerRadius(12)
-                    .padding(.horizontal, 24)
-                }
-                .disabled(isSaving)
-
-                Spacer()
             }
-            .navigationTitle("Konfirmasi Foto")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Batal") { dismiss() }
-                }
+            
+//            Button("Simpan Data") {
+//                Task {
+//                    await uploadAndSave()
+//                }
+//            }
+//            .buttonStyle(.borderedProminent)
+//            .disabled(isUploading)
+            
+            Button(action: {
+                Task { await uploadAndSave() }
+            }) {
+                Text("Simpan data")
+                    .bold()
+                    .frame(maxWidth: .infinity, minHeight: 35)
             }
-            // ✅ Tampilkan SuccessView setelah submit
-            .fullScreenCover(isPresented: $showSuccessView) {
-                SuccessView(
-                    machine: "Peralatan \(historyItem.equipmentID)",
-                     date: historyItem.maintenanceDate,
-                     details: historyItem.details,
-                     notes: historyItem.notes,
-                     status: historyItem.status,
-                     technician: historyItem.technician,
-                     image: image
-                )
+            .disabled(isUploading)
+            .buttonStyle(.borderedProminent)
+            .tint(.backgroundClr)
+            .foregroundColor(.foregroundClr)
+            .listRowBackground(Color.clear)
+            .listRowInsets(EdgeInsets())
+            .accessibilityHint("Tekan untuk melihat data yang telah diisi")
+            
+//            Button("Ambil ulang") {
+//                dismiss()
+//            }
+            Button(action: {
+                Task { dismiss() }
+            }) {
+                Text("Ambil ulang")
+                    .bold()
+                    .frame(maxWidth: .infinity, minHeight: 35)
             }
-            .alert("Error", isPresented: Binding(get: { saveError != nil }, set: { _ in saveError = nil })) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text(saveError ?? "Unknown error")
-            }
+            .buttonStyle(.plain)
+        }
+        .navigationTitle("Konfirmasi Foto")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(isPresented: $navigateToSuccessView) {
+            SuccessView(
+                machine: historyItem.equipmentID.uuidString,
+                date: historyItem.maintenanceDate,
+                details: historyItem.details,
+                notes: historyItem.notes,
+                status: historyItem.status,
+                technician: historyItem.technician,
+                image: capturedImage
+            )
         }
     }
     
-    private func submitRecord() {
-        isSaving = true
-        saveError = nil
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            isSaving = false
-            onSave()
-            showSuccessView = true
+    private func uploadAndSave() async {
+        isUploading = true
+        
+        do {
+            guard let imageData = capturedImage.jpegData(compressionQuality: 0.8) else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Gagal mengonversi gambar."])
+            }
+            
+            let insertedItem = try await SupabaseManager.shared.insertHistoryItem(item: historyItem)
+            guard let validID = insertedItem.id else {
+                throw NSError(domain: "SupabaseError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Gagal mendapatkan ID item yang disimpan."])
+            }
+            
+            let fileName = "\(validID).jpeg"
+            let photoPath = "maintenance-photos/\(fileName)"
+            
+            try await SupabaseManager.shared.uploadImage(data: imageData, path: photoPath)
+            try await SupabaseManager.shared.updateHistoryItemPhoto(id: validID, photoURL: photoPath)
+            
+            // Setelah berhasil, picu navigasi
+            navigateToSuccessView = true
+            
+        } catch {
+            print("Error: \(error)")
+            alertTitle = "Gagal"
+            alertMessage = "Terjadi kesalahan: \(error.localizedDescription)"
+            showingAlert = true
         }
+        
+        isUploading = false
     }
-
-    // Submit Button Handler
-//    private func submitRecord() {
-//        isSaving = true
-//        saveError = nil
-//
-//        guard let imageData = image.jpegData(compressionQuality: 0.85) else {
-//            saveError = "Gagal memproses foto."
-//            isSaving = false
-//            return
-//        }
-//
-//        let record = HistoryItem(
-//            machine: machine,
-//            date: date,
-//            details: details,
-//            notes: notes,
-//            photoData: imageData,
-//            status: status,
-//            technician: technician,
-//            spvStatus: "Pending",
-//            hodStatus: "Pending"
-//        )
-//
-//        context.insert(record)
-//        do {
-//            try context.save()
-//            onSave()
-//            isSaving = false
-//            showSuccessView = true   // 👈 pindah ke SuccessView
-//        } catch {
-//            isSaving = false
-//            saveError = "Gagal menyimpan: \(error.localizedDescription)"
-//        }
-//    }
-}
-
-#Preview {
-    ConfirmationView(
-        historyItem: HistoryItem(
-            equipmentID: UUID(),
-            maintenanceDate: Date(),
-            details: "Perlu pengecekan filter udara.",
-            notes: "Filter agak kotor, perlu dibersihkan.",
-            status: "Pending",
-            technician: "Nathan Gunawan"
-        ),
-        image: UIImage(systemName: "wrench.and.screwdriver")!,
-        onSave: {}
-    )
 }

@@ -19,17 +19,15 @@ struct InputView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
-                    // FORM CARD wrapped in ZStack
-                    ZStack {
+                    // FORM CARD
+                    VStack {
                         VStack(alignment: .leading, spacing: 16) {
-                            // Machine Picker
-                            inputField(title: "Machine") {
-                                FloatingDropdown(
-                                    title: "Select Machine",
+                            VStack(alignment: .leading, spacing: 6) {
+                                DropdownField(
+                                    title: "Nama Alat",
                                     selected: Binding(
                                         get: {
                                             if let id = viewModel.selectedEquipmentID {
-                                                // Menampilkan assetID, bukan UUID
                                                 if let equipment = viewModel.equipments.first(where: { $0.id == id }) {
                                                     return equipment.assetID
                                                 }
@@ -42,50 +40,50 @@ struct InputView: View {
                                             }
                                         }
                                     ),
-                                    options: viewModel.equipments.map { $0.assetID }
+                                    options: viewModel.equipments.map { $0.assetID },
+                                    isRequired: true,
+                                    showValidationError: viewModel.showValidationErrors
                                 )
-                            }
-                            .zIndex(2)
-                            if viewModel.showValidationErrors && viewModel.selectedEquipmentID == nil {
-                                validationMessage("Please select a machine")
                             }
                             
                             // Technician Name
                             inputField(title: "Nama Teknisi") {
-                                TextField("Enter technician name", text: $viewModel.technicianName)
+                                TextField("Masukkan nama teknisi", text: $viewModel.technicianName)
                                     .padding(10)
-                                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(viewModel.showValidationErrors && viewModel.technicianName.isEmpty ? Color.red : Color.gray.opacity(0.4))
+                                    )
                             }
                             if viewModel.showValidationErrors && viewModel.technicianName.isEmpty {
-                                validationMessage("Please enter technician name")
+                                validationMessage("Masukkan nama teknisi")
                             }
                             
                             // Maintenance Details
-                            inputField(title: "Maintenance Details") {
+                            inputField(title: "Detail Maintenance") {
                                 TextEditor(text: $viewModel.maintenanceDetails)
                                     .frame(height: 80)
                                     .padding(6)
-                                    .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(viewModel.showValidationErrors && viewModel.maintenanceDetails.isEmpty ? Color.red : Color.gray.opacity(0.4))
+                                    )
                             }
                             if viewModel.showValidationErrors && viewModel.maintenanceDetails.isEmpty {
-                                validationMessage("Please enter details")
+                                validationMessage("Masukkan detail maintenance")
                             }
                             
-                            // Status Selection
-                            inputField(title: "Maintenance Status") {
-                                FloatingDropdown(
-                                    title: "Select Status",
-                                    selected: $viewModel.maintenanceStatus,
-                                    options: statuses
-                                )
-                            }
-                            .zIndex(1)
-                            if viewModel.showValidationErrors && viewModel.maintenanceStatus.isEmpty {
-                                validationMessage("Please select maintenance status")
-                            }
+                            // Status Selection - Updated
+                            DropdownField(
+                                title: "Status Maintenance",
+                                selected: $viewModel.maintenanceStatus,
+                                options: statuses,
+                                isRequired: true,
+                                showValidationError: viewModel.showValidationErrors
+                            )
                             
                             // Additional Notes
-                            inputField(title: "Additional Notes (Optional)") {
+                            inputField(title: "Catatan Tambahan (Opsional)") {
                                 TextEditor(text: $viewModel.additionalNotes)
                                     .frame(height: 60)
                                     .padding(6)
@@ -106,7 +104,6 @@ struct InputView: View {
                         .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
                         .padding(.horizontal)
                     }
-                    .zIndex(1)
                     
                     // SUBMIT BUTTON
                     Button(action: {
@@ -116,33 +113,23 @@ struct InputView: View {
                             viewModel.showValidationErrors = true
                         }
                     }) {
-                        if viewModel.isLoading {
-                            ProgressView()
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color(.systemIndigo).opacity(0.8))
-                                .cornerRadius(10)
-                                .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                        } else {
                             HStack {
                                 Image(systemName: "camera")
                                 Text("Ambil Gambar")
                                     .fontWeight(.semibold)
                             }
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.foregroundClr)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color(.systemIndigo))
+                            .background(Color.backgroundClr)
                             .cornerRadius(10)
                             .shadow(color: .black.opacity(0.2), radius: 4, x: 0, y: 2)
-                        }
                     }
                     .padding(.horizontal)
                     
                     Spacer()
                 }
-                .navigationTitle("Input Form")
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationTitle("Form Maintenance")
             }
             // Navigasi ke CameraView
             .navigationDestination(isPresented: $navigateToCamera) {
@@ -161,7 +148,6 @@ struct InputView: View {
         }
     }
     
-    // MARK: - Helpers
     private func inputField<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
@@ -178,71 +164,6 @@ struct InputView: View {
             Text(text)
                 .foregroundColor(.red)
                 .font(.caption)
-        }
-    }
-}
-
-struct FloatingDropdown: View {
-    let title: String
-    @Binding var selected: String
-    let options: [String]
-
-    @State private var isOpen = false
-
-    var body: some View {
-        ZStack {
-            Button(action: { withAnimation { isOpen.toggle() } }) {
-                HStack {
-                    Text(selected.isEmpty ? title : selected)
-                        .foregroundColor(selected == "Rusak" ? .red : .primary)
-                    Spacer()
-                    Image(systemName: isOpen ? "chevron.up" : "chevron.down")
-                        .foregroundColor(.gray)
-                }
-                .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.4))
-                        .background(Color.white)
-                )
-            }
-            .zIndex(1)
-        }
-        .overlay(alignment: .topLeading) {
-            if isOpen {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(options, id: \.self) { option in
-                        Button(action: {
-                            selected = option
-                            withAnimation { isOpen = false }
-                        }) {
-                            HStack {
-                                Text(option)
-                                    .foregroundColor(option == "Rusak" ? .red : .primary)
-                                Spacer()
-                                if selected == option {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white)
-                        }
-                        Divider()
-                    }
-                }
-                .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.white)
-                        .shadow(radius: 6)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(Color.gray.opacity(0.3))
-                )
-                .padding(.top, 50)
-                .zIndex(1000) // force above textfields
-            }
         }
     }
 }
