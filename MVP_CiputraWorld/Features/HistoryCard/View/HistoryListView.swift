@@ -5,7 +5,6 @@
 //  Created by Kezia Elice on 29/08/25.
 //
 
-import Foundation
 import SwiftUI
 
 struct HistoryListView: View {
@@ -13,12 +12,15 @@ struct HistoryListView: View {
     @StateObject private var viewModel = HistoryViewModel()
     @GestureState private var dragOffset: CGFloat = 0
     
+    @State private var selectedHistory: HistoryItem?
+    
     @Environment(\.dynamicTypeSize)
     private var dynamicTypeSize: DynamicTypeSize
     
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ?
-        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+        AnyLayout(VStackLayout(alignment: .leading)) :
+        AnyLayout(HStackLayout(alignment: .center))
     }
     
     let equipmentID: UUID
@@ -26,7 +28,6 @@ struct HistoryListView: View {
     let startDate: Date?
     let endDate: Date?
     
-    // Convenience initializer untuk semua history (tanpa filter tanggal)
     init(equipmentID: UUID, equipmentName: String) {
         self.equipmentID = equipmentID
         self.equipmentName = equipmentName
@@ -34,7 +35,6 @@ struct HistoryListView: View {
         self.endDate = nil
     }
     
-    // Full initializer dengan date filtering
     init(equipmentID: UUID, equipmentName: String, startDate: Date, endDate: Date) {
         self.equipmentID = equipmentID
         self.equipmentName = equipmentName
@@ -44,8 +44,8 @@ struct HistoryListView: View {
     
     var body: some View {
         List(viewModel.histories) { history in
-            NavigationLink {
-                HistoryDetailView(history: history)
+            Button {
+                selectedHistory = history
             } label: {
                 dynamicLayout {
                     Text(history.details)
@@ -55,20 +55,21 @@ struct HistoryListView: View {
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
-                .padding(.vertical, 4)
+                .padding(.vertical, 4) // kasih tinggi saja
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+            .buttonStyle(.plain)
         }
+        .listStyle(.plain)
         .onAppear {
             Task {
                 if let startDate = startDate, let endDate = endDate {
-                    // Dengan filter tanggal
                     await viewModel.fetchHistory(
                         equipmentID: equipmentID,
                         startDate: startDate,
                         endDate: endDate
                     )
                 } else {
-                    // Tanpa filter tanggal - ambil semua history
                     await viewModel.fetchAllHistory(equipmentID: equipmentID)
                 }
             }
@@ -77,15 +78,12 @@ struct HistoryListView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
         .toolbar {
-            ToolbarItem(placement: .navigationBarLeading) {
-                HStack {
-                    Image(systemName: "chevron.left")
-                    Text("Back")
-                }
-                .foregroundColor(.accentColor)
-                .onTapGesture {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button("Selesai") {
                     dismiss()
                 }
+                .foregroundColor(.accentColor)
+                .fontWeight(.semibold)
             }
         }
         .gesture(
@@ -94,11 +92,15 @@ struct HistoryListView: View {
                     state = value.translation.width
                 }
                 .onEnded { value in
-                    // cek kalau swipe cukup jauh ke kanan
                     if value.translation.width > 100 && abs(value.translation.height) < 50 {
                         dismiss()
                     }
                 }
         )
+        .sheet(item: $selectedHistory) { history in
+            NavigationStack {
+                HistoryDetailView(history: history)
+            }
+        }
     }
 }

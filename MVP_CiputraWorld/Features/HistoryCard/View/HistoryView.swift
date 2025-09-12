@@ -5,7 +5,6 @@
 //  Created by Kezia Elice on 29/08/25.
 //
 
-import Foundation
 import SwiftUI
 
 struct HistoryView: View {
@@ -14,14 +13,15 @@ struct HistoryView: View {
     
     var dynamicLayout: AnyLayout {
         dynamicTypeSize.isAccessibilitySize ?
-        AnyLayout(VStackLayout(alignment: .leading)) : AnyLayout(HStackLayout(alignment: .center))
+        AnyLayout(VStackLayout(alignment: .leading)) :
+        AnyLayout(HStackLayout(alignment: .center))
     }
     
     @State private var selectedEquipmentID: UUID? = nil
     @State private var suggestedEquipment: String = ""
     @State private var startDate = Date()
     @State private var endDate = Date()
-    @State private var searchHistory = false
+    @State private var showHistoryList = false
     
     @StateObject private var viewModel = HistoryViewModel()
     
@@ -44,7 +44,6 @@ struct HistoryView: View {
                         .pickerStyle(.navigationLink)
                         .accessibilityHint("Pilih nama alat")
                         .onChange(of: selectedEquipmentID) { _, newValue in
-                            // Auto-fill code when the equipment is selected
                             if let equipmentID = newValue,
                                let equipment = viewModel.equipments.first(where: { $0.id == equipmentID }) {
                                 suggestedEquipment = equipment.assetID
@@ -61,7 +60,6 @@ struct HistoryView: View {
                                     syncEquipmentSelection(from: newValue)
                                 }
                         }
-                        
                     } header: {
                         Text("Peralatan")
                             .font(.caption)
@@ -70,29 +68,19 @@ struct HistoryView: View {
                     
                     Section {
                         dynamicLayout {
-                           Text("Dari tanggal")
-                           Spacer()
-                           DatePicker(
-                               "",
-                               selection: $startDate,
-                               displayedComponents: [.date]
-                           )
-                           .labelsHidden()
-                           .accessibilityLabel("Tanggal mulai")
-                           .accessibilityHint("Pilih tanggal awal periode pencarian")
-                       }
-                       dynamicLayout {
-                           Text("Sampai tanggal")
-                           Spacer()
-                           DatePicker(
-                               "",
-                               selection: $endDate,
-                               displayedComponents: [.date]
-                           )
-                           .labelsHidden()
-                           .accessibilityLabel("Tanggal selesai")
-                           .accessibilityHint("Pilih tanggal akhir periode pencarian")
-                       }
+                            Text("Dari tanggal")
+                            Spacer()
+                            DatePicker("", selection: $startDate, displayedComponents: [.date])
+                                .labelsHidden()
+                                .accessibilityLabel("Tanggal mulai")
+                        }
+                        dynamicLayout {
+                            Text("Sampai tanggal")
+                            Spacer()
+                            DatePicker("", selection: $endDate, displayedComponents: [.date])
+                                .labelsHidden()
+                                .accessibilityLabel("Tanggal selesai")
+                        }
                     } header: {
                         Text("Rentang Riwayat")
                             .font(.caption)
@@ -113,15 +101,17 @@ struct HistoryView: View {
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
                     .accessibilityHint("Tekan untuk mencari history card sesuai filter")
-                }
-                .navigationDestination(isPresented: $searchHistory) {
-                    if let equipmentID = getValidEquipmentID() {
-                        HistoryListView(
-                            equipmentID: equipmentID,
-                            equipmentName: selectedEquipment?.assetName ?? "Unknown Equipment",
-                            startDate: startDate,
-                            endDate: endDate
-                        )
+                    .sheet(isPresented: $showHistoryList) {
+                        if let equipmentID = getValidEquipmentID() {
+                            NavigationStack {
+                                HistoryListView(
+                                    equipmentID: equipmentID,
+                                    equipmentName: selectedEquipment?.assetName ?? "Unknown Equipment",
+                                    startDate: startDate,
+                                    endDate: endDate
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -135,27 +125,22 @@ struct HistoryView: View {
     }
     
     private func syncEquipmentSelection(from assetID: String) {
-        // Cari equipment berdasarkan assetID yang diinput manual
         if let equipment = viewModel.equipments.first(where: { $0.assetID == assetID }) {
             selectedEquipmentID = equipment.id
         } else {
-            // Jika tidak ditemukan, clear selection
             selectedEquipmentID = nil
         }
     }
     
     private func isFormValid() -> Bool {
-        // Validasi: harus ada equipment yang dipilih atau kode alat yang valid
         return getValidEquipmentID() != nil && startDate <= endDate
     }
     
     private func getValidEquipmentID() -> UUID? {
-        // Priority 1: Equipment yang dipilih dari picker
         if let selectedID = selectedEquipmentID {
             return selectedID
         }
         
-        // Priority 2: Equipment berdasarkan manual input kode alat
         if !suggestedEquipment.trimmingCharacters(in: .whitespaces).isEmpty,
            let equipment = viewModel.equipments.first(where: { $0.assetID == suggestedEquipment }) {
             return equipment.id
@@ -165,13 +150,11 @@ struct HistoryView: View {
     }
     
     private func handleSubmit() {
-        guard let equipmentID = getValidEquipmentID() else {
+        guard getValidEquipmentID() != nil else {
             print("No valid equipment selected")
             return
         }
-        
-        print("Submit data - Equipment ID: \(equipmentID), Period: \(startDate) to \(endDate)")
-        searchHistory = true
+        showHistoryList = true
     }
 }
 
