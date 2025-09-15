@@ -9,7 +9,6 @@ import SwiftUI
 
 struct EquipmentDetailView: View {
     @ObservedObject var equipment: Equipment
-    @Environment(\.presentationMode) var presentationMode
     @Environment(\.dismiss) var dismiss
     @GestureState private var dragOffset: CGFloat = 0
     @State private var navigateToHistory = false
@@ -21,71 +20,86 @@ struct EquipmentDetailView: View {
                 if let imagePath = equipment.imagePath, !imagePath.isEmpty {
                     Image(uiImage: UIImage(named: imagePath) ?? UIImage())
                         .resizable()
+                        .scaledToFill()
                         .frame(height: 200)
-                        .background(Color.gray.opacity(0.1))
+                        .clipped()
                 } else {
                     Image("ac")
                         .resizable()
+                        .scaledToFill()
                         .frame(height: 200)
-                        .background(Color.gray.opacity(0.1))
+                        .clipped()
                 }
                 
-                //Mandatory Attributes
-                VStack() {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text(equipment.assetName)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("ID: \(equipment.assetID)")
-                                .font(.body)
-                            
-                            Text("Lokasi: \(equipment.assetLocation)")
-                                .font(.body)
-                            
-                            Text("Last Maintenance: \(formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? ""))")
-                                .font(.body)
-                            
-                            Text("Next Maintenance: \(formatDate(equipment.assetSpecification["masaGaransi"] ?? ""))")
-                                .font(.body)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                VStack(alignment: .leading, spacing: 8) { // lebih rapat ke lokasi
+                    // Title
+                    Text(equipment.assetName)
+                        .font(.title2)
+                        .fontWeight(.semibold)
                     
-                    // Specifications Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Spesifikasi")
-                            .font(.title3)
-                            .fontWeight(.semibold)
+                    // Location as subtitle
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.and.ellipse")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Text(equipment.assetLocation)
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.top, -6)
+                    .padding(.bottom, 6)
+                    
+                    // Top info grid with border lines
+                    VStack(spacing: 0) {
+                        Divider() // Garis atas
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(Array(equipment.assetSpecification.keys.sorted().filter { $0 != "xPosition" && $0 != "yPosition" }), id: \.self) { key in
-                                if let value = equipment.assetSpecification[key], !value.isEmpty {
-                                    SpecificationRow(title: "\(key):", value: value)
-                                }
+                        HStack(spacing: 0) {
+                            InfoColumn(label: "ID", value: equipment.assetID)
+                            
+                            Divider().frame(height: 40)
+                            InfoColumn(
+                                label: "INSTALANSI",
+                                value: formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? "")
+                            )
+                            
+                            Divider().frame(height: 40)
+                            InfoColumn(
+                                label: "GARANSI",
+                                value: formatDate(equipment.assetSpecification["masaGaransi"] ?? "")
+                            )
+                        }
+                        .padding(.vertical, 6) // jarak teks dengan garis
+                        
+                        Divider() // Garis bawah
+                    }
+                    
+                    // Specifications
+                    Text("Spesifikasi")
+                        .font(.headline)
+                        .padding(.top, 8)
+                    
+                    VStack(spacing: 12) {
+                        ForEach(Array(equipment.assetSpecification.keys.sorted().filter { $0 != "xPosition" && $0 != "yPosition" }), id: \.self) { key in
+                            if let value = equipment.assetSpecification[key], !value.isEmpty {
+                                SpecRow(label: key, value: value)
                             }
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top)
                     
-                    // History Card Button
+                    // Button
                     Button(action: {
                         navigateToHistory = true
                     }) {
                         Text("Cek History Card")
                             .font(.body)
-                            .fontWeight(.medium)
-                            .foregroundColor(Color.foregroundClr)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
                             .background(Color.backgroundClr)
-                            .cornerRadius(10)
+                            .cornerRadius(12)
                     }
                     .padding(.top, 20)
-
-                    Spacer(minLength: 50)
                 }
                 .padding()
             }
@@ -93,23 +107,23 @@ struct EquipmentDetailView: View {
         .navigationTitle("Informasi Item")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(
-            leading: Button(action: {
-                presentationMode.wrappedValue.dismiss()
-            }) {
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
                 HStack {
                     Image(systemName: "chevron.left")
                     Text("Kembali")
                 }
+                .foregroundColor(.accentColor)
+                .onTapGesture { dismiss() }
             }
-        )
+        }
         .navigationDestination(isPresented: $navigateToHistory) {
-            // Langsung ke HistoryListView tanpa filter tanggal - ambil semua history
             HistoryListView(
                 equipmentID: equipment.id,
                 equipmentName: equipment.assetName
             )
         }
+        // Swipe gesture
         .gesture(
             DragGesture()
                 .updating($dragOffset) { value, state, _ in
@@ -121,7 +135,6 @@ struct EquipmentDetailView: View {
                     }
                 }
         )
-
     }
     
     private func formatDate(_ dateString: String) -> String {
@@ -129,7 +142,7 @@ struct EquipmentDetailView: View {
         inputFormatter.dateFormat = "yyyy-MM-dd"
         
         let outputFormatter = DateFormatter()
-        outputFormatter.dateFormat = "dd MMMM yyyy"
+        outputFormatter.dateFormat = "dd MMM yyyy"
         outputFormatter.locale = Locale(identifier: "id_ID")
         
         if let date = inputFormatter.date(from: dateString) {
@@ -139,23 +152,38 @@ struct EquipmentDetailView: View {
     }
 }
 
-// Helper view untuk specification row
-struct SpecificationRow: View {
-    let title: String
+// MARK: - Components
+struct InfoColumn: View {
+    let label: String
+    let value: String
+    
+    var body: some View {
+        VStack {
+            Text(label)
+                .font(.caption)
+                .foregroundColor(.gray)
+            Text(value)
+                .font(.subheadline)
+                .fontWeight(.semibold)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+struct SpecRow: View {
+    let label: String
     let value: String
     
     var body: some View {
         HStack {
-            Text(title)
-                .font(.body)
-                .foregroundColor(.primary)
-            
-            Text(value)
-                .font(.body)
-                .foregroundColor(.primary)
-            
+            Text(label)
+                .font(.subheadline)
+                .foregroundColor(.gray)
             Spacer()
+            Text(value)
+                .font(.subheadline)
+                .foregroundColor(.primary)
         }
+        Divider()
     }
 }
-

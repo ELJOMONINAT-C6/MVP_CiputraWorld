@@ -9,26 +9,23 @@ import SwiftUI
 
 struct FloorCard: View {
     let title: String
-    let imageName: String
     
     var body: some View {
-        ZStack {
-            Image(imageName)
-                .resizable()
-                .scaledToFill()
-                .frame(height: 120)
-                .clipped()
-                .overlay(Color("darkblue").opacity(0.7))
-                .cornerRadius(12)
-            
-            Text(title)
-                .font(.title)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-        }
+        Text(title)
+            .font(.title)
+            .fontWeight(.bold)
+//            .foregroundColor(Color(.label))
+            .foregroundColor(Color(.foregroundClr))
+            .frame(height: 120)
+            .frame(maxWidth: .infinity)
+//            .background(Color(.systemBackground))
+            .background(Color(.backgroundClr))
+            .cornerRadius(12)
+            .shadow(radius: 2)
+            .padding(.horizontal)
     }
 }
 
 #Preview {
-    FloorCard(title: "Lantai 1", imageName: "map")
+    FloorCard(title: "Lantai 1")
 }

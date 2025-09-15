@@ -10,17 +10,26 @@ import SwiftUI
 struct ContentView: View {
     @State private var selectedTab = 0
     
-    //for styling tab bar
+    //for styling tab bar & navigation bar
     init() {
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor.foregroundClr
+        // Tab Bar Appearance
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
+        tabAppearance.backgroundColor = UIColor.systemBackground
+        tabAppearance.stackedLayoutAppearance.selected.iconColor = UIColor.label
+        tabAppearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.label]
         
-        appearance.stackedLayoutAppearance.selected.iconColor = UIColor.label
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor.label]
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
         
-        UITabBar.appearance().standardAppearance = appearance
-        UITabBar.appearance().scrollEdgeAppearance = appearance
+        // Navigation Bar Appearance
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithOpaqueBackground()
+        navAppearance.titleTextAttributes = [.foregroundColor: UIColor(.backgroundClr)]
+        navAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor(.backgroundClr)]
+       
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().compactAppearance = navAppearance
     }
     
     var body: some View {
@@ -40,6 +49,7 @@ struct ContentView: View {
                 Label("Riwayat", systemImage: "note")
             }
         }
+        .tint(Color.backgroundClr)
     }
 }
 

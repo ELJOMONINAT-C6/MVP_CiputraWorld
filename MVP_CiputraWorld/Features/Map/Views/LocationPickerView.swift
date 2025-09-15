@@ -101,9 +101,9 @@ struct LocationPickerView: View {
                             }
                         }
                     }
-                    .padding(16)
+//                    .padding(16)
                     
-                    Spacer()
+//                    Spacer()
                 }
                 
                 // Bottom Sheet Konfirmasi
@@ -125,20 +125,20 @@ struct LocationPickerView: View {
                             } label: {
                                 Text("Konfirmasi")
                                     .font(.system(size: 16, weight: .medium))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color.foregroundClr)
                                     .frame(maxWidth: .infinity)
                                     .frame(height: 50)
-                                    .background(Color(red: 0.11, green: 0.16, blue: 0.31))
+                                    .background(Color.backgroundClr)
                                     .cornerRadius(8)
                             }
                             .padding(.horizontal, 20)
                             .padding(.bottom, 34)
                         }
                         .frame(maxWidth: .infinity)
-                        .background(Color.white)
+                        .background(Color(UIColor.systemBackground))
                         .cornerRadius(16)
                         .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: -5)
-                        .padding(.bottom, 80) // Add padding to move up from the bottom
+                        .padding(.bottom, 80)
                     }
                     .ignoresSafeArea(edges: .bottom)
                 }
