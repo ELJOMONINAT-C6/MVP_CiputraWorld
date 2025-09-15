@@ -101,7 +101,7 @@ struct AddItemView: View {
                                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
                                     Text("Ganti Foto")
                                         .font(.system(size: 14))
-                                        .foregroundColor(.blue)
+                                        .foregroundColor(Color.backgroundClr)
                                 }
                             } else {
                                 PhotosPicker(selection: $selectedPhoto, matching: .images) {
@@ -116,7 +116,7 @@ struct AddItemView: View {
                                                     .foregroundColor(.gray)
                                                 Text("Pilih Foto")
                                                     .font(.system(size: 16))
-                                                    .foregroundColor(.gray)
+                                                    .foregroundColor(Color.backgroundClr)
                                             }
                                         )
                                 }
@@ -190,13 +190,13 @@ struct AddItemView: View {
                     .background(Color(UIColor.systemBackground))
                     .cornerRadius(8)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 6)
+                        RoundedRectangle(cornerRadius: 12)
                             .stroke(Color(.systemGray4), lineWidth: 1)
                     )
                     .padding(.horizontal, 16)
                     .padding(.top, 16)
                     
-                    Spacer(minLength: 100)
+                    Spacer(minLength: 50)
                     
                     //Edit lokasi
                     if selectedLocation != nil {
@@ -230,10 +230,10 @@ struct AddItemView: View {
                         Button(action: handleSave) {
                             Text("Simpan")
                                 .font(.body.weight(.medium))
-                                .foregroundColor(.white)
+                                .foregroundColor(.foregroundClr)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 50)
-                                .background(isFormValid ? Color(red: 0.11, green: 0.16, blue: 0.31) : Color.gray)
+                                .background(isFormValid ? Color(.backgroundClr) : Color.gray)
                                 .cornerRadius(8)
                         }
                         .disabled(!isFormValid)
@@ -250,6 +250,7 @@ struct AddItemView: View {
                         ErrorMessage()
                     }
                 }
+                .background(Color(.secondarySystemBackground))
             }
             .navigationTitle("Tambahkan Item")
             .navigationBarTitleDisplayMode(.inline)

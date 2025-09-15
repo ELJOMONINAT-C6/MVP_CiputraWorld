@@ -64,14 +64,14 @@ struct EquipmentCardView: View {
                     .font(.subheadline)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color(.systemGray5))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                 
-                Text("Lokasi: \(equipment.assetLocation)")
+                Text("\(equipment.assetLocation)")
                     .font(.subheadline)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(Color(.systemGray5))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                     .lineLimit(1)
             }
@@ -79,7 +79,7 @@ struct EquipmentCardView: View {
             Spacer()
         }
         .padding(12)
-        .background(Color.white)
+        .background(Color(.systemBackground))
         .cornerRadius(8)
     }
 }

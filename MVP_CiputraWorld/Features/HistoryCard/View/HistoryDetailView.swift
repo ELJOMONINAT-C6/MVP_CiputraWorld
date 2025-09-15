@@ -104,17 +104,17 @@ struct HistoryDetailView: View {
             .navigationTitle("Detail Riwayat")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                // Tombol kembali
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        HStack {
-                            Image(systemName: "chevron.left")
-                            Text("Kembali")
-                        }
-                    }
-                }
+//                // Tombol kembali
+//                ToolbarItem(placement: .navigationBarLeading) {
+//                    Button {
+//                        dismiss()
+//                    } label: {
+//                        HStack {
+//                            Image(systemName: "chevron.left")
+//                            Text("Kembali")
+//                        }
+//                    }
+//                }
                 
                 // Tombol selesai
                 ToolbarItem(placement: .navigationBarTrailing) {

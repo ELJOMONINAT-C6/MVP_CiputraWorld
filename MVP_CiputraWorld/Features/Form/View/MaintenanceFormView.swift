@@ -12,6 +12,7 @@ import Supabase
 struct InputView: View {
     @StateObject private var viewModel = FormViewModel()
     @State private var navigateToCamera = false
+    @FocusState private var isDateFocused: Bool
     
     let statuses = ["Rusak", "Maintenance Selesai"]
     
@@ -47,8 +48,8 @@ struct InputView: View {
                             }
                             
                             // Technician Name
-                            inputField(title: "Nama Teknisi") {
-                                TextField("Masukkan nama teknisi", text: $viewModel.technicianName)
+                            inputField(title: "Nama Teknisi", isRequired: true) {
+                                TextField("Masukkan Nama Teknisi", text: $viewModel.technicianName)
                                     .padding(10)
                                     .background(
                                         RoundedRectangle(cornerRadius: 8)
@@ -60,7 +61,7 @@ struct InputView: View {
                             }
                             
                             // Maintenance Details
-                            inputField(title: "Detail Maintenance") {
+                            inputField(title: "Detail Maintenance", isRequired: true) {
                                 TextEditor(text: $viewModel.maintenanceDetails)
                                     .frame(height: 80)
                                     .padding(6)
@@ -70,7 +71,7 @@ struct InputView: View {
                                     )
                             }
                             if viewModel.showValidationErrors && viewModel.maintenanceDetails.isEmpty {
-                                validationMessage("Masukkan detail maintenance")
+                                validationMessage("Masukkan Detail Maintenance")
                             }
                             
                             // Status Selection - Updated
@@ -82,6 +83,30 @@ struct InputView: View {
                                 showValidationError: viewModel.showValidationErrors
                             )
                             
+                            // Date Picker
+                            HStack {
+                                HStack(spacing: 2) {
+                                    Text("Tanggal")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Text("*")
+                                        .foregroundColor(.red)
+                                        .font(.subheadline)
+                                }
+                                Spacer()
+                                DatePicker("", selection: $viewModel.maintenanceDate, displayedComponents: .date)
+                                    .labelsHidden()
+                                    .datePickerStyle(.compact)
+                                    .padding(.horizontal, 8)
+                                    .focused($isDateFocused)
+                                    .onChange(of: viewModel.maintenanceDate) {
+                                        isDateFocused = false
+                                    }
+
+                            }
+                            .padding(.vertical, 6)
+
+                            
                             // Additional Notes
                             inputField(title: "Catatan Tambahan (Opsional)") {
                                 TextEditor(text: $viewModel.additionalNotes)
@@ -89,19 +114,13 @@ struct InputView: View {
                                     .padding(6)
                                     .background(RoundedRectangle(cornerRadius: 8).stroke(Color.gray.opacity(0.4)))
                             }
-                            
-                            // Date Picker
-                            inputField(title: "Tanggal") {
-                                DatePicker("", selection: $viewModel.maintenanceDate, displayedComponents: .date)
-                                    .labelsHidden()
-                                    .datePickerStyle(.compact)
-                                    .padding(.horizontal, 8)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .background(RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.1)))
-                            }
                         }
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 12).stroke(Color.gray.opacity(0.3)))
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color(UIColor.systemBackground))
+                                .stroke(Color(UIColor.systemFill))
+                        )
                         .padding(.horizontal)
                     }
                     
@@ -129,9 +148,8 @@ struct InputView: View {
                     
                     Spacer()
                 }
-                .navigationTitle("Form Maintenance")
             }
-            // Navigasi ke CameraView
+            .navigationTitle("Form Maintenance")
             .navigationDestination(isPresented: $navigateToCamera) {
                 if let historyItem = viewModel.createHistoryItemPayload() {
                     CameraView(historyItem: historyItem)
@@ -145,14 +163,26 @@ struct InputView: View {
                     await viewModel.fetchEquipments()
                 }
             }
+            .background(Color(.secondarySystemBackground))
         }
     }
     
-    private func inputField<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func inputField<Content: View>(
+        title: String,
+        isRequired: Bool = false,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.semibold)
+            HStack(spacing: 2) {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                if isRequired {
+                    Text("*")
+                        .foregroundColor(.red)
+                        .font(.subheadline)
+                }
+            }
             content()
         }
     }

@@ -96,7 +96,7 @@ struct EquipmentDetailView: View {
                             .foregroundColor(.white)
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.backgroundClr) // Sesuaikan dengan Color.backgroundClr kamu
+                            .background(Color.backgroundClr)
                             .cornerRadius(12)
                     }
                     .padding(.top, 20)

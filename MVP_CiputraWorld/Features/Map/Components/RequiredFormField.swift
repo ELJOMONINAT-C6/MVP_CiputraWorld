@@ -105,20 +105,21 @@ struct SpecificationSection: View {
                 )
             }
             
+            Button(action: addNewAttribute) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 40))
+                    .foregroundColor(Color.backgroundClr)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            
             if customAttributes.isEmpty {
                 Text("Tap tombol + untuk menambahkan atribut spesifikasi")
                     .foregroundColor(.gray)
                     .italic()
+                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity, alignment: .center)
                     .padding(.vertical, 20)
             }
-            
-            Button(action: addNewAttribute) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 40))
-                    .foregroundColor(Color.foregroundClr)
-            }
-            .frame(maxWidth: .infinity, alignment: .center)
         }
     }
     

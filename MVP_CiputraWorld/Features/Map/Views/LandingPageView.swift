@@ -28,31 +28,32 @@ struct LandingPageView: View {
                                 
                                 Divider()
                                     .padding(.leading)
+                                    .background(Color(.separator))
                             }
                         }
-                        .background(Color.white)
+                        .background(Color(.systemBackground))
                     }
                 } else {
                     ScrollView {
                         VStack(spacing: 16) {
                             NavigationLink(destination: MapView(floorName: "Basement", mapViewModel: mapViewModel)) {
-                                FloorCard(title: "BASEMENT", imageName: "map")
+                                FloorCard(title: "BASEMENT")
                             }
                             
                             NavigationLink(destination: MapView(floorName: "Lantai LG", mapViewModel: mapViewModel)) {
-                                FloorCard(title: "LANTAI LG", imageName: "map")
+                                FloorCard(title: "LANTAI LG")
                             }
                             
                             NavigationLink(destination: MapView(floorName: "Lantai G", mapViewModel: mapViewModel)) {
-                                FloorCard(title: "LANTAI G", imageName: "map")
+                                FloorCard(title: "LANTAI G")
                             }
                             
                             NavigationLink(destination: MapView(floorName: "Lantai 1", mapViewModel: mapViewModel)) {
-                                FloorCard(title: "LANTAI 1", imageName: "map")
+                                FloorCard(title: "LANTAI 1")
                             }
                             
                             NavigationLink(destination: MapView(floorName: "Lantai 2", mapViewModel: mapViewModel)) {
-                                FloorCard(title: "LANTAI 2", imageName: "map")
+                                FloorCard(title: "LANTAI 2")
                             }
                         }
                         .padding(.horizontal)
@@ -65,6 +66,7 @@ struct LandingPageView: View {
             .onChange(of: mapViewModel.searchText) { _, newValue in
                 showingSearchResults = !newValue.isEmpty
             }
+            .background(Color(.secondarySystemBackground))
         }
     }
 }

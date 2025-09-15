@@ -80,7 +80,6 @@ struct MapView: View {
                 
                 CategoryFilterView(mapViewModel: mapViewModel)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading)
                     .padding(.top, 8)
             }
             
@@ -121,7 +120,7 @@ struct MapView: View {
                     Image(systemName: "plus.square.fill.on.square.fill")
                         .font(.system(size: 20))
                         .symbolRenderingMode(.monochrome)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.backgroundClr)
                 }
             }
         }

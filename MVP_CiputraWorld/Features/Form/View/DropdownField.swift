@@ -36,7 +36,7 @@ struct DropdownField: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack {
+            HStack(spacing: 2) {
                 Text(title)
                     .font(.subheadline)
                     .fontWeight(.semibold)

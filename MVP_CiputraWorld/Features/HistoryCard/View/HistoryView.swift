@@ -65,6 +65,7 @@ struct HistoryView: View {
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .listRowBackground(Color(.systemBackground))
                     
                     Section {
                         dynamicLayout {
@@ -82,10 +83,11 @@ struct HistoryView: View {
                                 .accessibilityLabel("Tanggal selesai")
                         }
                     } header: {
-                        Text("Rentang Riwayat")
+                        Text("Periode")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
+                    .listRowBackground(Color(.systemBackground))
                     
                     Button(action: {
                         handleSubmit()
@@ -98,7 +100,6 @@ struct HistoryView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.backgroundClr)
                     .foregroundColor(.foregroundClr)
-                    .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
                     .accessibilityHint("Tekan untuk mencari history card sesuai filter")
                     .sheet(isPresented: $showHistoryList) {
@@ -114,14 +115,17 @@ struct HistoryView: View {
                         }
                     }
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("Cari History Card")
+            .background(Color(UIColor.secondarySystemBackground))
             .onAppear {
                 Task {
                     await viewModel.fetchEquipments()
                 }
             }
         }
+        
     }
     
     private func syncEquipmentSelection(from assetID: String) {
