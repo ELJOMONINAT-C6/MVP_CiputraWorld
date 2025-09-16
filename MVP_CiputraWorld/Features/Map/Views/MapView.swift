@@ -138,6 +138,7 @@ struct MapView: View {
                      }
                  }
          )
+        .background(Color(.secondarySystemBackground))
     }
     
     private func resetMapView() {

@@ -258,6 +258,7 @@ struct AddItemView: View {
                 LocationPickerView(selectedLocation: $selectedLocation)
             }
         }
+        
     }
 }
 
