@@ -49,13 +49,13 @@ struct ConfirmationView: View {
             }) {
                 Text("Simpan data")
                     .bold()
-                    .frame(maxWidth: .infinity, minHeight: 35)
+                    .frame(maxWidth: 400, minHeight: 35)
             }
             .disabled(isUploading)
             .buttonStyle(.borderedProminent)
             .tint(.backgroundClr)
             .foregroundColor(.foregroundClr)
-            .listRowBackground(Color.clear)
+            .frame(width: 300)
             .listRowInsets(EdgeInsets())
             .accessibilityHint("Tekan untuk melihat data yang telah diisi")
             
@@ -67,7 +67,7 @@ struct ConfirmationView: View {
             }) {
                 Text("Ambil ulang")
                     .bold()
-                    .frame(maxWidth: .infinity, minHeight: 35)
+                    .frame(maxWidth: 400, minHeight: 35)
             }
             .buttonStyle(.plain)
         }

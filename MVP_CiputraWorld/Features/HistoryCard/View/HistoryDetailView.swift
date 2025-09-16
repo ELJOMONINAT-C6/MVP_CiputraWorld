@@ -24,14 +24,14 @@ struct HistoryDetailView: View {
                             image
                                 .resizable()
                                 .scaledToFill()
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: 400)
                                 .frame(height: 250)
                                 .clipped()
                         } placeholder: {
                             Image(systemName: "photo")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(maxWidth: .infinity)
+                                .frame(maxWidth: 400)
                                 .frame(height: 250)
                                 .foregroundColor(.gray)
                                 .background(Color.gray.opacity(0.1))
@@ -40,7 +40,7 @@ struct HistoryDetailView: View {
                         Image(systemName: "photo")
                             .resizable()
                             .scaledToFit()
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: 400)
                             .frame(height: 250)
                             .foregroundColor(.gray)
                             .background(Color.gray.opacity(0.1))
@@ -91,9 +91,9 @@ struct HistoryDetailView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         .padding() // isi dalam card
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .cornerRadius(16)
+                        .frame(maxWidth: 400, alignment: .leading)
+//                        .background(Color(uiColor: .secondarySystemBackground))
+//                        .cornerRadius(16)
                         .shadow(radius: 4)
                     }
                     .padding(.horizontal, 16) // ✅ konsisten batas kiri-kanan
@@ -132,7 +132,7 @@ struct HistoryDetailView: View {
 @ViewBuilder
 func dynamicLayout<Content: View>(@ViewBuilder content: () -> Content) -> some View {
     if UIDevice.current.userInterfaceIdiom == .phone {
-        VStack(alignment: .leading, spacing: 4) {
+        HStack(spacing: 4) {
             content()
         }
     } else {

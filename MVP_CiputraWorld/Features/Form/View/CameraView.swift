@@ -82,7 +82,7 @@ struct CameraView: View {
                 .paragraphStyle: paragraphStyle,
             ]
             
-            let padding: CGFloat = 16
+            let padding: CGFloat = 36
             let attributedText = NSAttributedString(string: text, attributes: attrs)
             let textSize = attributedText.size()
             let rect = CGRect(

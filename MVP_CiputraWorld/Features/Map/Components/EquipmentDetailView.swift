@@ -59,13 +59,13 @@ struct EquipmentDetailView: View {
                             Divider().frame(height: 40)
                             InfoColumn(
                                 label: "INSTALANSI",
-                                value: formatDate(equipment.assetSpecification["tanggalInstalasi"] ?? "")
+                                value: formatDate(equipment.assetSpecification["Tanggal Instalasi"] ?? "")
                             )
                             
                             Divider().frame(height: 40)
                             InfoColumn(
                                 label: "GARANSI",
-                                value: formatDate(equipment.assetSpecification["masaGaransi"] ?? "")
+                                value: formatDate(equipment.assetSpecification["Masa Garansi"] ?? "")
                             )
                         }
                         .padding(.vertical, 6) // jarak teks dengan garis
