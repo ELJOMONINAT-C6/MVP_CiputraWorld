@@ -94,7 +94,7 @@ struct HistoryDetailView: View {
                         .frame(maxWidth: 400, alignment: .leading)
 //                        .background(Color(uiColor: .secondarySystemBackground))
 //                        .cornerRadius(16)
-                        .shadow(radius: 4)
+//                        .shadow(radius: 4)
                     }
                     .padding(.horizontal, 16) // ✅ konsisten batas kiri-kanan
                     .padding(.top, 16)        // jarak atas dari foto
